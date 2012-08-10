@@ -17,12 +17,6 @@ var orms = [
     pk: 'id',               // primary key
 },
 {
-    name: 'ItemList',
-    abb: 'il',
-    type: 'list',
-    child: 'Item',
-},
-{
     name: 'Item',
     abb: 'i',
     type: 'hash',
@@ -36,6 +30,12 @@ var orms = [
     updateFilter: [0],
     clientFilter: [],
     pk: 'itemId',
+},
+{
+    name: 'ItemList',
+    abb: 'il',
+    type: 'list',
+    child: 'Item',
 },
 ];
 

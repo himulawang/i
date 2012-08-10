@@ -3,7 +3,6 @@ var ItemListModel = function ItemListModel() {
     this.type = 'list';
     this.objectName = 'ItemList';
     this.abb = 'il';
-    this.pk = 'undefined';
     this.child = 'Item';
     this.childModel = ItemModel;
 };

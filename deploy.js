@@ -110,7 +110,6 @@ var createModelListFile = function(orm) {
     content += "    this.type = '" + orm.type + "';\n";
     content += "    this.objectName = '" + orm.name + "';\n";
     content += "    this.abb = '" + orm.abb + "';\n";
-    content += "    this.pk = '" + orm.pk + "';\n";
     content += "    this.child = '" + orm.child + "';\n";
     content += "    this.childModel = " + orm.child + "Model;\n";
     content += "};\n";
