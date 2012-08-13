@@ -3,7 +3,7 @@ var UserModel = function UserModel() {
     this.type = 'hash';
     this.objectName = 'User';
     this.abb = 'u';
-    this.pk = 'id';
+    this.pk = 'userId';
     this.updateFilter = [0];
 };
 

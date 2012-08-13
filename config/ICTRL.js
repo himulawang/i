@@ -1,5 +1,5 @@
 var ctrl = {
-    'I1001': {
+    'i1001': { // login
         'action': 'UserAction',
         'param': {
             'userId': 'ni',
