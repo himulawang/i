@@ -142,10 +142,8 @@ var write = function(name, content, path) {
     var filename = name + '.js';
     var fullPath = path + '/' + filename;
 
-    fs.writeFile(fullPath, content, function(e) {
-        if (e) throw new IException(10002);
-        console.log(fullPath, 'Done!');
-    });
+    fs.writeFile(fullPath, content);
+    console.log(fullPath, 'Done!');
 };
 
 // create model files
@@ -160,6 +158,8 @@ var loaderContent =
 "global.db = redis.createClient();\n" +
 "\n" +
 "/* IFramework */\n" +
+"require('./Asyn.js');\n" + 
+"require('./Syn.js');\n" + 
 "require('./IConst.js');\n" + 
 "require('./IException.js');\n" + 
 "require('./IUtil.js');\n" + 
@@ -169,8 +169,31 @@ var loaderContent =
 "require('./IController.js');\n" +
 "\n" +
 "/* App */\n";
+
+// add model
 orms.forEach(function(orm) {
     loaderContent += "require('../model/" + orm.name + ".js');\n";
     loaderContent += "require('../model/" + orm.name + "Model.js');\n";
 });
+
+// add action
+loaderContent += 
+"\n" +
+"/* Action */\n";
+files = fs.readdirSync('./action/');
+
+files.forEach(function(v) {
+    loaderContent += "require('../action/" +  v + "');\n";
+});
+
+// add logic
+loaderContent += 
+"\n" +
+"/* Logic */\n";
+files = fs.readdirSync('./logic/');
+
+files.forEach(function(v) {
+    loaderContent += "require('../logic/" +  v + "');\n";
+});
+
 write('ILoader', loaderContent, './lib');

@@ -20,4 +20,4 @@ Item.prototype.__defineSetter__('itemTypeId', function(val) { this.args[1] = val
 Item.prototype.__defineSetter__('count', function(val) { this.args[2] = val; this.updateList[2] = 1; });
 Item.prototype.__defineSetter__('updateTime', function(val) { this.args[3] = val; this.updateList[3] = 1; });
 
-global.Item = Item;
+/* To Client */global.Item = Item;

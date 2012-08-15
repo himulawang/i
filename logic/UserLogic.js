@@ -1,6 +1,6 @@
 var UserLogic = function() {};
 
-UserLogic.prototype.signUp = function signUp(params, cb) {
+UserLogic.prototype.signUp = function signUp(syn, params, cb) {
     var user = new User();
     var nowTimestamp = IUtil.getTimestamp();
     user.level = 1;
@@ -18,9 +18,19 @@ UserLogic.prototype.signUp = function signUp(params, cb) {
     user.kingHeartAppearance = 0;
     user.loginCount = 0;
 
-    UserModel.add(user, function(user) {
-        cb(user);
+    // 1. add user
+    syn.add(function(user) {
+        UserModel.add(user, function(user) {
+            syn.emit('one', user);
+        });
+    }, user);
+
+    // 2. return user
+    syn.on('final', function(data) {
+        cb(data);
     });
+
+    return syn;
 };
 
 var userLogic = new UserLogic();

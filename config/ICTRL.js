@@ -1,4 +1,9 @@
 var ctrl = {
+    'i999': { // login
+        'action': 'UserAction',
+        'param': {
+        },
+    },
     'i1001': { // login
         'action': 'UserAction',
         'param': {
@@ -7,3 +12,5 @@ var ctrl = {
         },
     },
 };
+
+exports.ctrl = ctrl;

@@ -42,4 +42,4 @@ User.prototype.__defineSetter__('kingHeartLevel', function(val) { this.args[12] 
 User.prototype.__defineSetter__('kingHeartAppearance', function(val) { this.args[13] = val; this.updateList[13] = 1; });
 User.prototype.__defineSetter__('loginCount', function(val) { this.args[14] = val; this.updateList[14] = 1; });
 
-global.User = User;
+/* To Client */global.User = User;

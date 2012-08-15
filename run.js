@@ -4,10 +4,11 @@ var parse = require('url').parse;
 var http = require('http');
 
 http.createServer(function (req, res) {
-    res.writeHead(200, {'Content-Type': 'text/plain'});
     var params = parse(req.url, true).query;
+
+    res.writeHead(200, {'Content-Type': 'text/plain'});
     try {
-        var resData = IController.process(params, function(resData) {
+        IController.process(params, function(resData) {
             console.log(resData);
             res.end('Hello World\n');
         });
