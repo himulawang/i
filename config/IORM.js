@@ -26,6 +26,42 @@ var orms = [
     pk: 'userId',               // primary key
 },
 {
+    name: 'Card',
+    abb: 'c',               // abbreviation for redis hash name
+    type: 'hash',
+    child: null,
+    column: [               // column to create bo file, column index is hash field in redis
+        'cardId',
+        'cardTypeId',
+        'level',
+        'exp',
+        'strengthenLevel',
+        'strengthenExp',
+        'hp',
+        'atk',
+        'def',
+        'hit',
+        'dodge',
+        'critical',
+        'tough',
+        'initAnger',
+        'quality',
+        'flag',
+        'status',
+        'todoStatus',
+        'gemSlot',
+    ],
+    updateFilter: [0],
+    clientFilter: [6, 7, 8, 9, 10, 11, 12, 13, 15, 16, 17],
+    pk: 'cardId',               // primary key
+},
+{
+    name: 'CardList',
+    abb: 'cl',
+    type: 'list',
+    child: 'Card',
+},
+{
     name: 'Item',
     abb: 'i',
     type: 'hash',

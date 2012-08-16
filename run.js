@@ -10,7 +10,7 @@ http.createServer(function (req, res) {
     try {
         IController.process(params, function(resData) {
             console.log(resData);
-            res.end('Hello World\n');
+            res.end(JSON.stringify(resData));
         });
     } catch (e) {
         IUtil.printError(e);

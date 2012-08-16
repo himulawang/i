@@ -21,7 +21,7 @@ UserLogic.prototype.signUp = function signUp(syn, params, cb) {
     // 1. add user
     syn.add(function(user) {
         UserModel.add(user, function(user) {
-            syn.emit('one', user);
+            syn.emit('one', user.toClient());
         });
     }, user);
 
