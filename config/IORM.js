@@ -62,6 +62,31 @@ var orms = [
     child: 'Card',
 },
 {
+    name: 'Building',
+    abb: 'b',               // abbreviation for redis hash name
+    type: 'hash',
+    child: null,
+    column: [               // column to create bo file, column index is hash field in redis
+        'userId',
+        'castleNextHarvestMoneyTime',
+        'castleHarvestBonus',
+        'cardNextRecruit1Time',
+        'cardDailyRecruit1Count',
+        'cardDailyRecruit1Count',
+        'cardLastResetDailyRecruit1CountTime',
+        'cardNextRecruit2Time',
+        'cardNextRecruit3Time',
+        'cardNextRecruit4Time',
+        'barrackFormation1',
+        'barrackFormation2',
+        'barrackFormation3',
+        'barrackActiveFormationId',
+    ],
+    updateFilter: [0],
+    clientFilter: [],
+    pk: 'userId',               // primary key
+},
+{
     name: 'Item',
     abb: 'i',
     type: 'hash',

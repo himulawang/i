@@ -1,5 +1,5 @@
 var ctrl = {
-    'i999': { // login
+    'i999': { // sign up
         'action': 'UserAction',
         'param': {
         },
@@ -9,6 +9,14 @@ var ctrl = {
         'param': {
             'userId': 'ni',
             'userName': 'ms',
+        },
+    },
+    'i3002': {
+        'action': 'CardMarketAction',
+        'param': {
+            'userId': 'ni',
+            'recruitTypeId': 'ni',
+            'useItemId': 'ni',
         },
     },
 };

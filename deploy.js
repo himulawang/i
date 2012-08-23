@@ -1,5 +1,6 @@
 require('./lib/IConst.js');
 var fs = require('fs');
+var path = require('path');
 
 var orms = require('./config/IORM.js').orms;
 var IException = require('./lib/IException.js').IException;
@@ -24,7 +25,7 @@ var removeFileInPath = function(path) {
         console.log('Delete', filename, 'Done!');
     });
 };
-removeFileInPath('./model');
+// removeFileInPath('./model');
 
 var create = function(orm) {
     switch (orm.type) {
@@ -185,10 +186,14 @@ var createModelListFile = function(orm) {
     write(modelName, content, './model');
 };
 
-var write = function(name, content, path) {
+var write = function(name, content, path, overwrite) {
     var filename = name + '.js';
     var fullPath = path + '/' + filename;
 
+    if (!overwrite && fs.existsSync(fullPath)) {
+        console.log(fullPath, 'exists, skip!');
+        return;
+    }
     fs.writeFile(fullPath, content);
     console.log(fullPath, 'Done!');
 };
@@ -223,12 +228,20 @@ orms.forEach(function(orm) {
     loaderContent += "require('../model/" + orm.name + "Model.js');\n";
 });
 
+// add const
+loaderContent += 
+"\n" +
+"/* Const */\n";
+files = fs.readdirSync('./const/');
+files.forEach(function(v) {
+    loaderContent += "require('../const/" +  v + "');\n";
+});
+
 // add action
 loaderContent += 
 "\n" +
 "/* Action */\n";
 files = fs.readdirSync('./action/');
-
 files.forEach(function(v) {
     loaderContent += "require('../action/" +  v + "');\n";
 });
@@ -238,9 +251,26 @@ loaderContent +=
 "\n" +
 "/* Logic */\n";
 files = fs.readdirSync('./logic/');
-
 files.forEach(function(v) {
     loaderContent += "require('../logic/" +  v + "');\n";
 });
 
-write('ILoader', loaderContent, './lib');
+// merge exception
+loaderContent += 
+"\n" +
+"/* Merge Exception */\n" +
+"var IEX = require('../config/IEX.js').IEX;\n" +
+"for (var i in IEX) {\n" + 
+"    IExceptionCodes[i] = IEX[i];\n" +
+"}\n";
+
+// add data
+loaderContent += 
+"\n" +
+"/* Data */\n";
+files = fs.readdirSync('./data/');
+files.forEach(function(v) {
+    loaderContent += "require('../data/" +  v + "');\n";
+});
+
+write('ILoader', loaderContent, './lib', true /* overwrite */);
