@@ -14,6 +14,13 @@ var PvzkConst = {
     // card status
     'CARD_STATUS_CANDIDATE': 0,
     'CARD_STATUS_IN_POCKET': 1,
+
+    // card flag
+    'CARD_FLAG_NEW': 1,
+
+    // card todo status
+    'CARD_TODO_STATUS_DONOTHING': 0,
+    'CARD_TODO_STATUS_ATTRIBUTE_REFRESH': 1,
 };
 
 global.PvzkConst = PvzkConst;

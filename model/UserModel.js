@@ -4,6 +4,7 @@ var UserModel = function UserModel() {
     this.objectName = 'User';
     this.abb = 'u';
     this.pk = 'userId';
+    this.pkAutoIncrement = true;
     this.updateFilter = [0];
 };
 

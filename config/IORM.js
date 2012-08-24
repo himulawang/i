@@ -24,6 +24,7 @@ var orms = [
     updateFilter: [0],
     clientFilter: [6, 7, 10, 14],
     pk: 'userId',               // primary key
+    pkAutoIncrement: true,
 },
 {
     name: 'Card',
@@ -54,6 +55,7 @@ var orms = [
     updateFilter: [0],
     clientFilter: [6, 7, 8, 9, 10, 11, 12, 13, 15, 16, 17],
     pk: 'cardId',               // primary key
+    pkAutoIncrement: true,
 },
 {
     name: 'CardList',
@@ -72,7 +74,6 @@ var orms = [
         'castleHarvestBonus',
         'cardNextRecruit1Time',
         'cardDailyRecruit1Count',
-        'cardDailyRecruit1Count',
         'cardLastResetDailyRecruit1CountTime',
         'cardNextRecruit2Time',
         'cardNextRecruit3Time',
@@ -85,6 +86,7 @@ var orms = [
     updateFilter: [0],
     clientFilter: [],
     pk: 'userId',               // primary key
+    pkAutoIncrement: false,
 },
 {
     name: 'Item',
@@ -100,6 +102,7 @@ var orms = [
     updateFilter: [0],
     clientFilter: [],
     pk: 'itemId',
+    pkAutoIncrement: true,
 },
 {
     name: 'ItemList',

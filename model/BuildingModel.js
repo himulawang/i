@@ -4,6 +4,7 @@ var BuildingModel = function BuildingModel() {
     this.objectName = 'Building';
     this.abb = 'b';
     this.pk = 'userId';
+    this.pkAutoIncrement = false;
     this.updateFilter = [0];
 };
 

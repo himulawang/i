@@ -4,6 +4,7 @@ var ItemModel = function ItemModel() {
     this.objectName = 'Item';
     this.abb = 'i';
     this.pk = 'itemId';
+    this.pkAutoIncrement = true;
     this.updateFilter = [0];
 };
 

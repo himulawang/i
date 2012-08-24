@@ -22,7 +22,7 @@ UserLogic.prototype.signUp = function signUp(syn, params, cb) {
         newUser.loginCount = 0;
 
         UserModel.add(newUser, function(result) {
-            var user = result;
+            user = result;
             syn.emit('one', user.toClient());
         });
     }, null);
@@ -35,8 +35,7 @@ UserLogic.prototype.signUp = function signUp(syn, params, cb) {
         newBuilding.userId = user.userId;
         newBuilding.castleNextHarvestMoneyTime = nowTimestamp;
         newBuilding.castleHarvestBonus = 0;
-        newBuilding.castleNextRecruit1Time = nowTimestamp;
-        newBuilding.cardDailyRecruit1Time = nowTimestamp;
+        newBuilding.cardNextRecruit1Time = nowTimestamp;
         newBuilding.cardDailyRecruit1Count = 0;
         newBuilding.cardLastResetDailyRecruit1CountTime = nowTimestamp;
         newBuilding.cardNextRecruit2Time = nowTimestamp;
@@ -48,8 +47,8 @@ UserLogic.prototype.signUp = function signUp(syn, params, cb) {
         newBuilding.barrackActiveFormationId = 1;
 
         BuildingModel.add(newBuilding, function(result) {
-            var building = result;
-            syn.emit('one', building.toClinet());
+            building = result;
+            syn.emit('one', building.toClient());
         });
     }, null);
 

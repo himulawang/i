@@ -11,7 +11,7 @@ CardMarketLogic.prototype.refreshCard = function refreshCard(syn, params, cb) {
         UserModel.retrieve(params.userId, function(result) {
             user = result;
             level = user.level;
-            syn.emit('one', result);
+            syn.emit('one', null);
         });
     }, params);
 
@@ -20,7 +20,7 @@ CardMarketLogic.prototype.refreshCard = function refreshCard(syn, params, cb) {
     syn.add(function(params) {
         CardListModel.retrieve(params.userId, function(result) {
             cardList = result;
-            syn.emit('one', result);
+            syn.emit('one', null);
         });
     }, params);
 
@@ -29,11 +29,12 @@ CardMarketLogic.prototype.refreshCard = function refreshCard(syn, params, cb) {
     syn.add(function(params) {
         BuildingModel.retrieve(params.userId, function(result) {
             building = result;
-            syn.emit('one', result);
+            syn.emit('one', null);
         });
     }, params);
 
-    // 4. delete candidate card
+    var util = IUtil;
+    // 4. delete candidate card & add new candidate cards
     syn.add(function(params) {
         // delete candidate cards
         cardList.deleteCandidateCard();
@@ -56,8 +57,32 @@ CardMarketLogic.prototype.refreshCard = function refreshCard(syn, params, cb) {
         }
 
         // random card
-        var poolList = {};
-        
+        var poolList = CardDropPackage[packageId];
+        var probabilityList = {};
+
+        // make probability list
+        for (var i in poolList) {
+            probabilityList[i] = poolList[i].probability;
+        }
+
+        var id, cardTypeId, quality;
+        for (var c = 0; c < 3; ++c) {
+            id = util.getElementByProbability(probabilityList);
+            cardTypeId = poolList[id].card_type_id;
+            quality = poolList[id].quality;
+
+            card = CardLogic.makeCard(cardTypeId, quality, 1);
+            cardList.add(card);
+        }
+        syn.emit('one', null);
+    }, params);
+
+    // 5. update
+    syn.add(function(params) {
+        CardListModel.update(cardList, function(result) {
+            cardList = result;
+            syn.emit('one', cardList.toClient());
+        });
     }, params);
 
     // 2. return user

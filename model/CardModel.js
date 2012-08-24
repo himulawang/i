@@ -4,6 +4,7 @@ var CardModel = function CardModel() {
     this.objectName = 'Card';
     this.abb = 'c';
     this.pk = 'cardId';
+    this.pkAutoIncrement = true;
     this.updateFilter = [0];
 };
 
