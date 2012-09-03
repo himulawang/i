@@ -7,35 +7,35 @@ CardMarketLogic.prototype.refreshCard = function refreshCard(syn, params, cb) {
 
     // 1. retrieve user
     var user, level;
-    syn.add(function(params) {
+    syn.add(function() {
         UserModel.retrieve(params.userId, function(result) {
             user = result;
             level = user.level;
-            syn.emit('one', null);
+            syn.emit('one');
         });
-    }, params);
+    });
 
     // 2. retrieve cardList
     var cardList;
-    syn.add(function(params) {
+    syn.add(function() {
         CardListModel.retrieve(params.userId, function(result) {
             cardList = result;
-            syn.emit('one', null);
+            syn.emit('one');
         });
-    }, params);
+    });
 
     // 3. retrieve building
     var building;
-    syn.add(function(params) {
+    syn.add(function() {
         BuildingModel.retrieve(params.userId, function(result) {
             building = result;
-            syn.emit('one', null);
+            syn.emit('one');
         });
-    }, params);
+    });
 
     var util = IUtil;
     // 4. delete candidate card & add new candidate cards
-    syn.add(function(params) {
+    syn.add(function() {
         // delete candidate cards
         cardList.deleteCandidateCard();
 
@@ -74,20 +74,23 @@ CardMarketLogic.prototype.refreshCard = function refreshCard(syn, params, cb) {
             card = CardLogic.makeCard(cardTypeId, quality, 1);
             cardList.add(card);
         }
-        syn.emit('one', null);
-    }, params);
+        syn.emit('one');
+    });
 
     // 5. update
-    syn.add(function(params) {
+    syn.add(function() {
         CardListModel.update(cardList, function(result) {
             cardList = result;
-            syn.emit('one', cardList.toClient());
+            syn.emit('one');
         });
-    }, params);
+    });
 
     // 2. return user
-    syn.on('final', function(data) {
-        cb(data);
+    syn.on('final', function() {
+        var output = {
+            cl: cardList.toClient(),
+        };
+        cb(output);
     });
 
     return syn;

@@ -1,23 +1,6 @@
-var redis = require('redis');
-global.db = redis.createClient();
+require('./lib/ILoader.js');
 
-require('./lib/IConst.js');
-require('./lib/IException.js');
-require('./lib/IUtil.js');
-require('./lib/IObject.js');
-require('./lib/IModel.js');
-require('./lib/IList.js');
-
-// model
-require('./model/UserModel.js');
-require('./model/ItemModel.js');
-require('./model/ItemListModel.js');
-
-// object & list
-require('./model/User.js');
-require('./model/Item.js');
-require('./model/ItemList.js');
-
+/*
 var itemList = new ItemList(2);
 var testAddItem = function() {
     var item1 = new Item([null, 1, 2, 3]);
@@ -70,3 +53,8 @@ var testDropItem = function(itemList) {
 
 // start chain
 testAddItem();
+*/
+
+ItemModel.retrieve(19999, function(result) {
+    console.log(result);
+});

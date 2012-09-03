@@ -23,9 +23,9 @@ UserLogic.prototype.signUp = function signUp(syn, params, cb) {
 
         UserModel.add(newUser, function(result) {
             user = result;
-            syn.emit('one', user.toClient());
+            syn.emit('one');
         });
-    }, null);
+    });
 
     // 2. add building
     var building;
@@ -48,13 +48,17 @@ UserLogic.prototype.signUp = function signUp(syn, params, cb) {
 
         BuildingModel.add(newBuilding, function(result) {
             building = result;
-            syn.emit('one', building.toClient());
+            syn.emit('one');
         });
-    }, null);
+    });
 
-    // 2. return user
-    syn.on('final', function(data) {
-        cb(data);
+    // 3. return output
+    syn.on('final', function() {
+        var output = {
+            u: user.toClient(),
+            b: building.toClient(),
+        };
+        cb(output);
     });
 
     return syn;
