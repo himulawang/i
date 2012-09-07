@@ -1,0 +1,52 @@
+* {
+    margin: 0px;
+    padding: 0px;
+    font-family: Monaco;
+}
+
+body {
+    width: 100%;
+}
+
+table {
+    width: 100%;
+}
+
+select, button {
+    width: 100%;
+}
+
+#jewel-wrap {
+    width: 1200px;
+    height: 600px;
+    margin: 50px auto;
+}
+
+#jewel-sys-info {
+    width: 200px;
+    height: 600px;
+    border: 1px solid #AAAAAA;
+    box-shadow: 1px 0px 0px #CCCCCC;
+    float: left;
+}
+
+#jewel-battle-ground {
+    min-width: 445px;
+    min-height: 445px;
+    border: 1px solid #AAAAAA;
+    box-shadow: 1px 1px 2px #CCCCCC;
+    float: left;
+    margin-left: 5px;
+    position: relative;
+}
+
+.jewel-gems {
+    border: 1px solid #CCCCCC;
+    box-shadow: 1px 0px 2px #CCCCCC;
+    opacity: 0.8;
+    font-size: 10px;
+}
+
+.selected {
+    border: 1px solid #000000;
+}
