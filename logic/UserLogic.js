@@ -64,6 +64,4 @@ UserLogic.prototype.signUp = function signUp(syn, params, cb) {
     return syn;
 };
 
-var userLogic = new UserLogic();
-
-global.UserLogic = userLogic;
+exports.UserLogic = new UserLogic();

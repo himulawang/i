@@ -68,6 +68,4 @@ CardLogic.prototype.recalculateCardAttribute = function recalculateCardAttribute
     return card;
 };
 
-var cardLogic = new CardLogic();
-
-global.CardLogic = cardLogic;
+exports.CardLogic = new CardLogic();

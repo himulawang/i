@@ -2,7 +2,6 @@ exports.orms = [
 {
     name: 'User',
     abb: 'u',               // abbreviation for redis hash name
-    child: null,
     column: [               // column to create bo file, column index is hash field in redis
         'userId',
         'level',
@@ -29,7 +28,6 @@ exports.orms = [
 {
     name: 'Card',
     abb: 'c',               // abbreviation for redis hash name
-    child: null,
     column: [               // column to create bo file, column index is hash field in redis
         'cardId',
         'cardTypeId',

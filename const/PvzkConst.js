@@ -23,4 +23,4 @@ var PvzkConst = {
     'CARD_TODO_STATUS_ATTRIBUTE_REFRESH': 1,
 };
 
-global.PvzkConst = PvzkConst;
+exports.PvzkConst = PvzkConst;

@@ -115,6 +115,4 @@ CardMarketLogic.prototype.verifyRecruitUseItemId = function(useItemId) {
     ) throw new IException(20210);
 };
 
-var cardMarketLogic = new CardMarketLogic();
-
-global.CardMarketLogic = cardMarketLogic;
+exports.CardMarketLogic = new CardMarketLogic();

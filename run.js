@@ -1,7 +1,29 @@
 require('i').init();
 
-console.log(global);
+var card = new Card();
+card.level = 1;
+
+//var cardList = new CardList(1);
+
+//cardList.add(card);
+CardListModel.retrieve(1, function(data) {
+    console.log(data.toClient());
+
+    data.del(2);
+    CardListModel.update(data);
+});
+
+
+
+
 /*
+user.level = 1;
+console.dir(user);
+
+UserModel.retrieve(3, function(data) {
+    console.log(data.toClient());
+});
+
 require('./lib/ILoader.js');
 
 var parse = require('url').parse;
