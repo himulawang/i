@@ -1,3 +1,7 @@
+require('i').init();
+
+console.log(global);
+/*
 require('./lib/ILoader.js');
 
 var parse = require('url').parse;
@@ -21,3 +25,4 @@ http.createServer(function (req, res) {
     }
 }).listen(1337, '10.88.228.232');
 
+*/
