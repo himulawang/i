@@ -1,1 +1,0 @@
-global.LevelRecruitPackage = {"1":{"id":1,"bottom_level":1,"top_level":2,"recruit_drop_package_id":1,"recruit_type_id":1},"2":{"id":2,"bottom_level":3,"top_level":5,"recruit_drop_package_id":2,"recruit_type_id":1},"3":{"id":3,"bottom_level":6,"top_level":100,"recruit_drop_package_id":3,"recruit_type_id":1}};

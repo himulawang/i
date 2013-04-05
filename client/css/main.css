@@ -1,0 +1,17 @@
+.left {
+    float: left;
+}
+.clear {
+    clear: both;
+}
+.inline {
+    display: inline-block;
+    vertical-align: top;
+}
+.pointer {
+    cursor: pointer;
+}
+.border { 
+    border: 1px solid #DDD;
+    border-radius: 6px;
+}
