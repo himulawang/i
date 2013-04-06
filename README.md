@@ -2,6 +2,8 @@ ParaNoidz I Framework
 ===
 基于纯Javascript平台的MVC框架，为简洁和效率而生。
 
+Chrome、Websocket、node.js、Redis的组合，将HTML5 App的效率推到极致。
+
 Sample: [PCS](https://github.com/himulawang/pcs)
 
 目录
@@ -20,11 +22,11 @@ Model
 * [1、PK.js](#1pkjs)
   * [new PK([pk])](#new-pkpk)
   * [PK.set(val)](#pksetval)
-  * [PK.get()](pkget)
-  * [PK.reset()](pkreset)
-  * [PK.incr([val])](pkincrval)
-  * [PK.backup()](pkbackup)
-  * [PK.restore(bak)](pkrestorebak)
+  * [PK.get()](#pkget)
+  * [PK.reset()](#pkreset)
+  * [PK.incr([val])](#pkincrval)
+  * [PK.backup()](#pkbackup)
+  * [PK.restore(bak)](#pkrestorebak)
   * [PK.restoreSync(bak) SyncAPI](#pkrestoresyncbak-syncapi)
   * [PK.markDelSync() SyncAPI](#pkmarkdelsync-syncapi)
 * [2、Model.js](#2modeljs)
