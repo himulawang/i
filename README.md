@@ -6,11 +6,107 @@ Sample: [PCS](https://github.com/himulawang/pcs)
 
 目录
 
-* [Model层](#model)
+Model
+
+* [Model层概述及运行机理](#model)
   * [orm.js配置](#ormjs)
-  * [自动生成模型文件](#create-model-files-automatically-)
-  * [继承顺序](#inherits-)
-* [Model API](#model-api)
+  * [Create Model Files Automatically 自动生成模型文件](#create-model-files-automatically-)
+  * [Inherits 继承顺序](#inherits-)
+  * [Model转换为Redis的数据结构规则](#modelredis)
+  * [Client Model文件](#client-model)
+
+[Model API](#model-api)
+
+* [1、PK.js](#1pkjs)
+  * [new PK([pk])](#new-pkpk)
+  * [PK.set(val)](#pksetval)
+  * [PK.get()](pkget)
+  * [PK.reset()](pkreset)
+  * [PK.incr([val])](pkincrval)
+  * [PK.backup()](pkbackup)
+  * [PK.restore(bak)](pkrestorebak)
+  * [PK.restoreSync(bak) SyncAPI](#pkrestoresyncbak-syncapi)
+  * [PK.markDelSync() SyncAPI](#pkmarkdelsync-syncapi)
+* [2、Model.js](#2modeljs)
+  * [new Model([args])](#new-modelargs)
+  * [Model.setPK(pk)](#modelsetpkpk)
+  * [Model.getPK()](#modelgetpk)
+  * [Model.clone()](#modelclone)
+  * [Model.resetUpdateList()](#modelresetupdatelist)
+  * [Model.toAdd([filterOn])](#modeltoaddfilteron)
+  * [Model.toUpdate([filterOn])](#modeltoupdatefilteron)
+  * [Model.toAbbArray([filterOn])](#modeltoabbarrayfilteron)
+  * [Model.toArray([filterOn])](#modeltoarrayfilteron)
+  * [Model.toAbbDiff([filterOn])](#modeltoabbdifffilteron)
+  * [Model.toArrayDiff([filterOn])](#modeltoarraydifffilteron)
+  * [Model.fromAbbArray(data[, resetUpdateList])](#modelfromabbarraydata-resetupdatelist)
+  * [Model.fromArray(data[, resetUpdateList])](#modelfromarraydata-resetupdatelist)
+  * [Model.backup()](#modelbackup)
+  * [Model.restore(bak)](#modelrestorebak)
+  * [Model.restoreSync(bak) SyncAPI](#modelrestoresyncbak-syncapi)
+  * [Model.markAddSync() SyncAPI](#modelmarkaddsync-syncapi)
+  * [Model.markDelSync() SyncAPI](#modelmarkdelsync-syncapi)
+* [3、List.js](#3listjs)
+  * [new List(pk[, list])](#new-listpk-list)
+  * [List.setPK(pk)](#listsetpkpk)
+  * [List.getPK()](#listgetpk)
+  * [List.reset([list])](#listresetlist)
+  * [List.add(child)](#listaddchild)
+  * [List.del(input)](#listdelinput)
+  * [List.update(child)](#listupdatechild)
+  * [List.get(pk)](#listgetpk-1)
+  * [List.set(child)](#listsetchild)
+  * [List.unset(input)](#listunsetinput)
+  * [List.getKeys()](#listgetkeys)
+  * [List.getList()](#listgetlist)
+  * [List.toAbbArray([filterOn])](#listtoabbarrayfilteron)
+  * [List.toArray([filterOn])](#listtoarrayfilteron)
+  * [List.fromAbbArray(data[, resetUpdateList])](#listfromabbarraydata-resetupdatelist)
+  * [List.fromArray(data[, resetUpdateList])](#listfromarraydata-resetupdatelist)
+  * [List.last()](#listlast)
+  * [List.backup()](#listbackup)
+  * [List.restore(bak)](#listrestorebak)
+  * [List.restoreSync(bak)](#listrestoresyncbak)
+  * [List.addSync(child) SyncAPI](#listaddsyncchild-syncapi)
+  * [List.delSync(input) SyncAPI](#listdelsyncinput-syncapi)
+  * [List.updateSync(child) SyncAPI](#listupdatesyncchild-syncapi)
+  * [List.markDelSync() SyncAPI](#listmarkdelsync-syncapi)
+* [4、PKStore.js](#4pkstorejs)
+  * [PKStore.get(cb)](#pkstoregetcb)
+  * [PKStore.set(pk[, cb])](#pkstoresetpk-cb)
+  * [PKStore.unset(pk[, cb])](#pkstoreunsetpk-cb)
+  * [PKStore.sync() SyncAPI](#pkstoresync-syncapi)
+* [5、ModelStore.js](#5modelstorejs)
+  * [ModelStore.get(pk, cb)](#modelstoregetpk-cb)
+  * [ModelStore.add(model[, cb])](#modelstoreaddmodel-cb)
+  * [ModelStore.del(input[, cb])](#modelstoredelinput-cb)
+  * [ModelStore.update(model[, cb])](#modelstoreupdatemodel-cb)
+  * [ModelStore.sync() SyncAPI](#modelstoresync-syncapi)
+* [6、ListStore.js](#6liststorejs)
+  * [ListStore.get(pk, cb)](#liststoregetpk-cb)
+  * [ListStore.del(list[, cb])](#liststoredellist-cb)
+  * [ListStore.update(list[, cb])](#liststoreupdatelist-cb)
+  * [ListStore.sync() SyncAPI](#liststoresync-syncapi)
+
+View
+
+* [View层概述及运行机理](#view)
+  * [Server端View层](#serverview)
+  * [Client端View层](#clientview)
+
+Controller
+
+* [Controller层概述及运行机理](#controller)
+  * [Server端Controller层](#servercontroller)
+  * [Client端Controller层](#clientcontroller)
+
+TODO
+
+* [TODO](#todo)
+
+Acknowledgement
+
+* [Acknowledgement](#acknowledgement)
 
 # Model层概述及运行机理
 
@@ -896,7 +992,7 @@ PRIVATE API FOR DataPool
 
 ## 4、PKStore.js
 
-### PKStore.get(cb);
+### PKStore.get(cb)
 
 ```js
 /*
@@ -1197,7 +1293,7 @@ $(function() {
 ### Server端Controller层
 通过配置routes.js来完成
 
-···js
+```js
 C0001: {
     ctrl: 'Table',
     action: 'Update'
@@ -1264,7 +1360,7 @@ Route.process(connection, req);会先检查传入参数，通过后自动找到�
 
 通过route.js来完成
 
-···js
+```js
 C0001: {
     ctrl: 'Table',
     action: 'Update'         
