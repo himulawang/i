@@ -1,7 +1,8 @@
 ParaNoidz I Framework
 ===
+[Model层](#Model层)
 
-基于纯Javascript平台的MVC框架，为效率而生。
+基于纯Javascript平台的MVC框架，为简洁和效率而生。
 
 ## Model层
 
@@ -91,7 +92,7 @@ Store结尾的类文件用于和Redis进行交互，将3类模型文件转化为
 
 以下有*SyncAPI*标识的为同步模式API。
 
-## PK.js
+## 1、PK.js
 
 ### new([pk])
 
@@ -190,7 +191,7 @@ pk.restore(bak);
 var val = pk.get(); // 255
 ```
 
-## Model.js
+## 2、Model.js
 
 ### new([args])
 
@@ -220,8 +221,8 @@ var description = table.description; // 'sample'
 var table = new Table();
 table.setPK(18);
 
-var id = table.id // 18
-var pk = table.getPK() // 18
+var id = table.id; // 18
+var pk = table.getPK(); // 18
 ```
 
 ### .getPK()
@@ -234,8 +235,8 @@ var pk = table.getPK() // 18
 var table = new Table();
 table.setPK(18);
 
-var id = table.id // 18
-var pk = table.getPK() // 18
+var id = table.id; // 18
+var pk = table.getPK(); // 18
 ```
 
 ### .clone()
@@ -249,11 +250,11 @@ var table1 = new Table([1, 'user', 'sample1']);
 var table2 = table1.clone();
 table2.id = '2';
 
-var id1 = table1.id // 1
-var name1 = table1.name // 'user'
+var id1 = table1.id; // 1
+var name1 = table1.name; // 'user'
 
-var id2 = table2.id // 2
-var name2 = table2.name // 'user'
+var id2 = table2.id; // 2
+var name2 = table2.name; // 'user'
 ```
 
 ### .resetUpdateList()
@@ -317,10 +318,10 @@ var toAbbArray = table.toAbbArray(); // { i: 1, n: 'user', d: 'sample' };
 var toFilteredAbbArray = table.toAbbArray(true); // { i: 1, n: 'user' };
 ```
 
-abb为abbreviation，缩写的意思，会将Model属性名自动转化为短名缩写，减小网络传输量和Redis占用空间，但不适合阅读和调试。规则如下：
+abb为abbreviation缩写，会将Model属性名自动转化为短名缩写，减小网络传输量和Redis占用空间，但不适合阅读和调试。规则如下：
 
 1. 将第一个小写字母和后续的大写字母、数字拼成，如：autoResetTimestamp1 -> art1
-2. 遇到重名，先在重名后的缩写中 + '1'，然后累加。如：已有art，autoRestartTime -> art1，已有art1，autoRestartTime1 -> art2
+2. 遇到重名，先在重名后的缩写中 + '1'，然后累加。如：已有art，autoRestartTime -> art1;已有art1，autoRestartTime1 -> art2
 
 ```js
 return /^([a-zA-Z0-9]+?)(\d+)$/.test(abb) ? RegExp.$1 + (parseInt(RegExp.$2) + 1) : abb + 1;
@@ -473,7 +474,7 @@ dataPool.sync(); // this will add Table 1 to redis
 ### *SyncAPI* .markDelSync()
 PRIVATE API FOR DataPool
 
-## List.js
+## 3、List.js
 
 ### new(pk[, list])
 
@@ -592,11 +593,11 @@ tableList.update(table1);
 // table1 will change in tableList.list, also appears in toUpdateList
 ```
 
-### .get()
+### .get(pk)
 
 ```js
 /*
-@param void 
+@param number pk 
 @return object
 */
 var table1 = new Table([1, 'user', 'sample']);
@@ -834,7 +835,7 @@ tableList.delSync(3);
 dataPool.sync(); // this will del 2 tables from redis
 ```
 
-### *SyncAPI* .delSync(child)
+### *SyncAPI* .updateSync(child)
 
 ```js
 /*
@@ -863,4 +864,272 @@ dataPool.sync(); // this will update table1 to redis
 ```
 
 ### *SyncAPI* .markDelSync()
+PRIVATE API FOR DataPool
+
+## 4、PKStore.js
+
+### .get(cb);
+
+```js
+/*
+@param function cb
+@return void
+*/
+TablePKStore.get(function(err, tablePK) {
+    if (err) {
+        // something
+        return;
+    }
+
+    // something with tablePK
+});
+```
+
+### .set(pk[, cb])
+
+```js
+/*
+@param object pk
+@param function || undefined cb
+@return void
+*/
+var tablePK = new TablePK(22);
+TablePKStore.set(tablePK, function(err, redisResult) {
+    if (err) {
+        // something
+        return;
+    }
+
+    // something with redisResult
+});
+
+// this will set a STRING to redis, key: 'I-GK-t', value: 22
+```
+
+### .unset(pk[, cb])
+
+```js
+/*
+@param object pk
+@param function || undefined cb
+@return void
+*/
+TablePKStore.get(function(err, tablePK) {
+    if (err) {
+        // something
+        return;
+    }
+
+    TablePKStore.unset(tablePK, function(err, redisResult) {
+        if (err) {
+            // something
+            return;
+        }
+
+        // something with redisResult
+    });
+});
+
+// this will remove key: 'I-GK-t' from redis
+```
+
+### *SyncAPI* .sync()
+PRIVATE API FOR DataPool
+
+## 5、ModelStore.js
+
+### .get(pk, cb)
+
+```js
+/*
+@param number pk
+@param function || undefined cb
+@return void
+*/
+TableStore.get(1, function(err, table) {
+    if (err) {
+        // something
+        return;
+    }
+
+    // something with table
+});
+```
+
+### .add(model[, cb])
+
+```js
+/*
+@param object model
+@param function || undefined cb
+@return void
+*/
+var table = new Table([1, 'user', 'sample']);
+TableStore.add(table, function(err, table, redisResult) {
+    if (err) {
+        // something
+        return;
+    }
+
+    // something with table or redisResult
+});
+
+// this will add a HASH to redis, key: 't-1', fields: [0, 1, 2], values:['1', 'user', 'sample']
+```
+
+### .del(input[, cb])
+
+```js
+/*
+@param number || object input
+@param function || undefined cb
+@return void
+*/
+TableStore.del(1, function(err, redisResult) {
+    if (err) {
+        // something
+        return;
+    }
+
+    // something with redisResult
+});
+
+// this will remove a HASH from redis, key: 't-1'
+
+// also can
+var table = new Table(['1', 'name', 'description']);
+TableStore.del(table, function(err, redisResult) {
+    if (err) {
+        // something
+        return;
+    }
+
+    // something with redisResult
+});
+
+// same effect
+```
+
+### .update(model[, cb])
+
+```js
+/*
+@param object model
+@param function || undefined cb
+@return void
+*/
+TableStore.get(1, function(err, table) {
+    if (err) {
+        // something
+        return;
+    }
+
+    table.name = 'nameChanged';
+
+    TableStore.update(table, function(err, table, redisResult) {
+        // something with table or redisResult
+    });
+});
+
+// this will update a HASH to redis, key: 't-1', field: '1', value: 'nameChanged'
+```
+
+### *SyncAPI* .sync()
+PRIVATE API FOR DataPool
+
+## ListStore.js
+
+### .get(pk, cb)
+
+```js
+/*
+@param number pk
+@param function cb
+@return void
+*/
+TableListStore.get(1, function(err, tableList) {
+    if (err) {
+        // something
+        return;
+    }
+
+    // something with tableList
+});
+
+// this will get 'tl-1', 't1', 't3' from redis and make a TableList instance
+```
+
+### .del(list[, cb])
+
+```js
+/*
+@param object list
+@param function || undefined cb
+@return void
+*/
+TableListStore.get(1, function(err, tableList) {
+    if (err) {
+        // something
+        return;
+    }
+
+    TableListStore.del(tableList, function(err, list, redisResult) {
+        if (err) {
+            // something
+            return;
+        }
+
+        // something with empty list or redisResult
+    });
+});
+
+// this will del 'tl-1', 't1', 't3' from redis and return a empty TableList instance
+```
+
+### .update(list[, cb])
+
+```js
+/*
+@param object list
+@param function || undefined cb
+@return void
+*/
+TableListStore.get(1, function(err, tableList) {
+    if (err) {
+        // something
+        return;
+    }
+
+    // add new table
+    var newTable = new Table([7, 'log', 'sample']);
+    tableList.add(newTable);
+
+    // del a table
+    tableList.del(1);
+
+    // update a table
+    var table3 = tableList.get(3);
+    table3.name = 'nameChanged';
+
+    TableListStore.update(tableList, function(err, list, redisResult) {
+        if (err) {
+            // something
+            return;
+        }
+
+        // something with updated list or redisResult
+    });
+});
+
+// this will del 't1'
+
+// set new HASH key: 't7', field: [0, 1, 2], value: ['7', 'log', 'sample']
+// set HASH key: 'tl1', field: 7, value: 1
+
+// update HASH key: 't3', field: 1, value: 'nameChanged'
+
+// to redis
+```
+
+### *SyncAPI* .sync()
 PRIVATE API FOR DataPool
