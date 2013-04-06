@@ -1,17 +1,21 @@
 ParaNoidz I Framework
 ===
-* [Model层](#model)
-  * [orm.js配置](#ormjs)
-  * [自动生成模型文件](#createmodelfilesautomatically)
-  * [继承顺序](#inherits)
-* [Model API](#modelapi)
-
 基于纯Javascript平台的MVC框架，为简洁和效率而生。
 
-## Model层
+Sample: [PCS](https://github.com/himulawang/pcs)
+
+目录
+
+* [Model层](#model)
+  * [orm.js配置](#ormjs)
+  * [自动生成模型文件](#create-model-files-automatically-)
+  * [继承顺序](#inherits-)
+* [Model API](#model-api)
+
+# Model层概述及运行机理
 
 ### orm.js配置
-Model主要由orm.js配置生成
+Model文件主要由orm.js配置生成，Server和Client两边都需要配置。
 
 ```js
 {
@@ -85,6 +89,21 @@ PK.js、Model.js、List.js拥有最基础的API。
 
 Store结尾的类文件用于和Redis进行交互，将3类模型文件转化为Redis指令进行存取。
 
+### Model转换为Redis的数据结构规则
+
+PK转化为type: STRING, key: 'I-GK-' + abb, value: pk
+
+Model转化为type: HASH, key: abb + pk, field: ['0', '1'... n], value: [value0, value1, ... valueN]
+
+List转化为
+
+一个type: HASH, key: abb + 'l' + pk, field: [child1.pk, child2.pk... childN.pk], value: [1, 1... 1]，用于记录List的主键。
+
+N个type: HASH, key: abb + pk, field: ['0', '1'... n], value: [value0, value1, ... valueN]
+
+### Client Model文件
+Model文件在客户端只有PK、Model、List有效。当服务端生成Model文件后，直接将文件Copy入client目录下，直接引用即可。
+
 # Model API
 注：Model API分两种，异步模式和同步模式。
 
@@ -98,28 +117,30 @@ Store结尾的类文件用于和Redis进行交互，将3类模型文件转化为
 
 ## 1、PK.js
 
-### new([pk])
+### new PK([pk])
 
 ```js
 /*
 @param number || undefined pk val start from 0
 @return instance
 */
-var pk = new TablePK(pk);
+var pk = new TablePK(256);
+pk.get(); // 256
 ```
 
-### .set(val)
+### PK.set(val)
 
 ```js
 /*
-@param number pk
+@param number val
 @return void
 */
-var pk = new TablePK(pk);
-pk.set(val);
+var pk = new TablePK();
+pk.set(1024);
+pk.get() // 1024
 ```
 
-### .get()
+### PK.get()
 
 ```js
 /*
@@ -127,10 +148,10 @@ pk.set(val);
 @return number
 */
 var pk = new TablePK(14);
-var val = pk.get(); // 14
+pk.get(); // 14
 ```
 
-### .reset()
+### PK.reset()
 
 ```js
 /*
@@ -139,10 +160,10 @@ var val = pk.get(); // 14
 */
 var pk = new TablePK(77);
 pk.reset();
-var val = pk.get(); // 0
+pk.get(); // 0
 ```
 
-### .incr([val])
+### PK.incr([val])
 
 ```js
 /*
@@ -150,23 +171,36 @@ var val = pk.get(); // 0
 @return number
 */
 var pk = new TablePK();  // 0
-var val = pk.incr(); // 1
-val = pk.incr(77); // 78
+pk.incr(); // 1
+pk.incr(77); // 78
 ```
 
 
-### .backup()
+### PK.backup()
 
 ```js
 /*
 @param void
 @return object bak
 */
-var pk = new TablePK(1);  // 0
-var bak = pk.backup(); // { type: 'PK', className: 'TablePK', pk: 1 }
+var pk = new TablePK(1);
+pk.backup(); // { type: 'PK', className: 'TablePK', pk: 1 }
 ```
 
-### .restore(bak)
+### PK.restore(bak)
+
+```js
+/*
+@param object bak
+@return void
+*/
+var pk = new TablePK();  // 0
+var bak = { type: 'PK', className: 'TablePK', pk: 255 }
+pk.restore(bak);
+pk.get(); // 255
+```
+
+### PK.restoreSync(bak) *SyncAPI*
 
 ```js
 /*
@@ -179,25 +213,13 @@ pk.restore(bak);
 var val = pk.get(); // 255
 ```
 
-### *SyncAPI* .markDelSync() 
+### PK.markDelSync() *SyncAPI*
+
 PRIVATE API FOR DataPool
-
-### *SyncAPI* .restoreSync(bak)
-
-```js
-/*
-@param object bak
-@return void
-*/
-var pk = new TablePK();  // 0
-var bak = { type: 'PK', className: 'TablePK', pk: 255 }
-pk.restore(bak);
-var val = pk.get(); // 255
-```
 
 ## 2、Model.js
 
-### new([args])
+### new Model([args])
 
 ```js
 /*
@@ -205,17 +227,17 @@ var val = pk.get(); // 255
 @return instance
 */
 var table = new Table();
-var id = table.id; // ''
-var name = table.name; // ''
-var description = table.description; // ''
+table.id; // ''
+table.name; // ''
+table.description; // ''
 
 var table = new Table([1, 'user', 'sample']);
-var id = table.id; // 1
-var name = table.name; // 'user'
-var description = table.description; // 'sample'
+table.id; // 1
+table.name; // 'user'
+table.description; // 'sample'
 ```
 
-### .setPK(pk)
+### Model.setPK(pk)
 
 ```js
 /*
@@ -225,11 +247,11 @@ var description = table.description; // 'sample'
 var table = new Table();
 table.setPK(18);
 
-var id = table.id; // 18
-var pk = table.getPK(); // 18
+table.id; // 18
+table.getPK(); // 18
 ```
 
-### .getPK()
+### Model.getPK()
 
 ```js
 /*
@@ -239,11 +261,11 @@ var pk = table.getPK(); // 18
 var table = new Table();
 table.setPK(18);
 
-var id = table.id; // 18
-var pk = table.getPK(); // 18
+table.id; // 18
+table.getPK(); // 18
 ```
 
-### .clone()
+### Model.clone()
 
 ```js
 /*
@@ -254,14 +276,14 @@ var table1 = new Table([1, 'user', 'sample1']);
 var table2 = table1.clone();
 table2.id = '2';
 
-var id1 = table1.id; // 1
-var name1 = table1.name; // 'user'
+table1.id; // 1
+table1.name; // 'user'
 
-var id2 = table2.id; // 2
-var name2 = table2.name; // 'user'
+table2.id; // 2
+table2.name; // 'user'
 ```
 
-### .resetUpdateList()
+### Model.resetUpdateList()
 
 ```js
 /*
@@ -271,16 +293,16 @@ var name2 = table2.name; // 'user'
 var table = new Table([1, 'user', 'sample']);
 table.description = 'description changed';
 
-var toUpdate = table.toUpdate(); // { 2: 'description changed'}
+table.toUpdate(); // { 2: 'description changed'}
 
 table.resetUpdateList();
 
-toUpdate = table.toUpdate(); // {}
+table.toUpdate(); // {}
 ```
 
 同时，这个方法也会重置tagAddSync和tagDelSync两个标识。
 
-### .toAdd([filterOn])
+### Model.toAdd([filterOn])
 
 ```js
 /*
@@ -288,13 +310,13 @@ toUpdate = table.toUpdate(); // {}
 @return array
 */
 var table = new Table([1, 'user', 'sample']);
-var toAdd = table.toAdd(); // ['1', 'user', 'sample'];
+table.toAdd(); // ['1', 'user', 'sample'];
 
 // orm.js: toAddFilter: [2], 
-var toFilteredAdd = table.toAdd(true); // ['1', 'user'];
+table.toAdd(true); // ['1', 'user'];
 ```
 
-### .toUpdate([filterOn])
+### Model.toUpdate([filterOn])
 
 ```js
 /*
@@ -302,13 +324,15 @@ var toFilteredAdd = table.toAdd(true); // ['1', 'user'];
 @return object
 */
 var table = new Table([1, 'user', 'sample']);
-var toUpdate = table.toUpdate(); // { 0: 1, 1: 'user', 2: 'sample' };
+table.id = 2;
+table.description = 'description changed';
+table.toUpdate(); // { 0: 2, 2: 'description changed' };
 
 // orm.js: toUpdateFilter: [0], 
-var toFilteredUpdated = table.toUpdate(true); // { 1: 'user', 2: 'sample' };
+table.toUpdate(true); // { 2: 'description changed' };
 ```
 
-### .toAbbArray([filterOn])
+### Model.toAbbArray([filterOn])
 
 ```js
 /*
@@ -316,22 +340,22 @@ var toFilteredUpdated = table.toUpdate(true); // { 1: 'user', 2: 'sample' };
 @return object
 */
 var table = new Table([1, 'user', 'sample']);
-var toAbbArray = table.toAbbArray(); // { i: 1, n: 'user', d: 'sample' };
+table.toAbbArray(); // { i: 1, n: 'user', d: 'sample' };
 
 // orm.js: toAbbFilter: [2],
-var toFilteredAbbArray = table.toAbbArray(true); // { i: 1, n: 'user' };
+table.toAbbArray(true); // { i: 1, n: 'user' };
 ```
 
-abb为abbreviation缩写，会将Model属性名自动转化为短名缩写，减小网络传输量和Redis占用空间，但不适合阅读和调试。规则如下：
+abb为abbreviation缩写，会将Model属性名自动转化为短名缩写，减小网络传输量和Redis占用空间，但不易阅读和调试。规则如下：
 
-1. 将第一个小写字母和后续的大写字母、数字拼成，如：autoResetTimestamp1 -> art1
+1. 以第一个小写字母和后续的大写字母、数字拼成，并全部转为小写，如：autoResetTimestamp1 -> art1
 2. 遇到重名，先在重名后的缩写中 + '1'，然后累加。如：已有art，autoRestartTime -> art1;已有art1，autoRestartTime1 -> art2
 
 ```js
 return /^([a-zA-Z0-9]+?)(\d+)$/.test(abb) ? RegExp.$1 + (parseInt(RegExp.$2) + 1) : abb + 1;
 ```
 
-### .toArray([filterOn])
+### Model.toArray([filterOn])
 
 ```js
 /*
@@ -339,13 +363,13 @@ return /^([a-zA-Z0-9]+?)(\d+)$/.test(abb) ? RegExp.$1 + (parseInt(RegExp.$2) + 1
 @return object
 */
 var table = new Table([1, 'user', 'sample']);
-var toArray = table.toArray(); // { id: 1, name: 'user', description: 'sample' };
+table.toArray(); // { id: 1, name: 'user', description: 'sample' };
 
 // orm.js: toFilter: [2],
-var toFilteredArray = table.toArray(true); // { id: 1, name: 'user' };
+table.toArray(true); // { id: 1, name: 'user' };
 ```
 
-### .toAbbDiff([filterOn])
+### Model.toAbbDiff([filterOn])
 
 ```js
 /*
@@ -354,14 +378,14 @@ var toFilteredArray = table.toArray(true); // { id: 1, name: 'user' };
 */
 var table = new Table([1, 'user', 'sample']);
 table.name = 'nameChanged';
-var toAbbDiff = table.toAbbDiff(); // { n: 'nameChanged' };
+table.toAbbDiff(); // { n: 'nameChanged' };
 
 // orm.js: toAbbFilter: [2],
 table.description = 'descriptionChanged';
-var toFilteredAbbDiff = table.toAbbDiff(true); // { n: 'nameChanged' };
+table.toAbbDiff(true); // { n: 'nameChanged' };
 ```
 
-### .toArrayDiff([filterOn])
+### Model.toArrayDiff([filterOn])
 
 ```js
 /*
@@ -377,7 +401,7 @@ table.description = 'descriptionChanged';
 var toFilteredArrayDiff = table.toArrayDiff(true); // { name: 'nameChanged' };
 ```
 
-### .fromAbbArray(data[, resetUpdateList])
+### Model.fromAbbArray(data[, resetUpdateList])
 
 ```js
 /*
@@ -389,15 +413,15 @@ var table = new Table();
 var data = { n: 'nameChanged' };
 table.fromAbbArray(data);
 
-var val = table.name; // 'nameChanged'
+table.name; // 'nameChanged'
 table.updateList; // [undefined, 1, undefined]
 
 table.fromAbbArray(data, true);
-var val = table.name; // 'nameChanged'
+table.name; // 'nameChanged'
 table.updateList; // [undefined, undefined, undefined]
 ```
 
-### .fromArray(data[, resetUpdateList])
+### Model.fromArray(data[, resetUpdateList])
 
 ```js
 /*
@@ -409,15 +433,15 @@ var table = new Table();
 var data = { name: 'nameChanged' };
 table.fromArray(data);
 
-var val = table.name; // 'nameChanged'
+table.name; // 'nameChanged'
 table.updateList; // [undefined, 1, undefined]
 
 table.fromArray(data, true);
-var val = table.name; // 'nameChanged'
+table.name; // 'nameChanged'
 table.updateList; // [undefined, undefined, undefined]
 ```
 
-### .backup()
+### Model.backup()
 
 ```js
 /*
@@ -425,10 +449,10 @@ table.updateList; // [undefined, undefined, undefined]
 @return object
 */
 var table = new Table([1, 'user', 'sample']);
-var bak = table.backup(); // { type: 'Model', className: 'Table', data: { id: 1, name: 'user', 'description': 'sample'} }
+table.backup(); // { type: 'Model', className: 'Table', data: { id: 1, name: 'user', description: 'sample'} }
 ```
 
-### .restore(bak)
+### Model.restore(bak)
 
 ```js
 /*
@@ -436,15 +460,15 @@ var bak = table.backup(); // { type: 'Model', className: 'Table', data: { id: 1,
 @return void
 */
 var table = new Table();
-var bak = { type: 'Model', className: 'Table', data: { id: 1, name: 'user', 'description': 'sample'} };
+var bak = { type: 'Model', className: 'Table', data: { id: 1, name: 'user', description: 'sample'} };
 table.restore(bak);
 
-var id = table.id; // 1
-var name = table.name; // 'user'
-var description = table.description; // 'sample'
+table.id; // 1
+table.name; // 'user'
+table.description; // 'sample'
 ```
 
-### *SyncAPI* .restoreSync(bak)
+### Model.restoreSync(bak) *SyncAPI*
 
 ```js
 /*
@@ -461,41 +485,44 @@ var description = table.description; // 'sample'
 var tagAddSync = table.tagAddSync; // true
 ```
 
-### *SyncAPI* .markAddSync()
+### Model.markAddSync() *SyncAPI*
 
 ```js
 /*
-@param object bak
+@param void
 @return void
 */
 var table = new Table([1, 'table', 'sample']);
 table.markAddSync();
 
 dataPool.set('table', 1);
-dataPool.sync(); // this will add Table 1 to redis
+dataPool.sync(); // this will add a HASH to redis, key: 't1', field: ['0', '1', '2'], value: ['1', 'table', 'sample']
 ```
 
-### *SyncAPI* .markDelSync()
+### Model.markDelSync() *SyncAPI*
 PRIVATE API FOR DataPool
 
 ## 3、List.js
 
-### new(pk[, list])
+### new List(pk[, list])
 
 ```js
 /*
 @param number pk
-@param object list
+@param object || undefined list
 @return instance
 */
 var tableList1 = new TableList(1);
 
+// or
+
 var table1 = new Table([1, 'user', 'sample']);
 var table2 = new Table([2, 'item', 'sample']);
+
 var tableList2 = new TableList(2, { 1: table1, 2: table2});
 ```
 
-### .setPK(pk)
+### List.setPK(pk)
 
 ```js
 /*
@@ -505,11 +532,12 @@ var tableList2 = new TableList(2, { 1: table1, 2: table2});
 var table1 = new Table([1, 'user', 'sample']);
 var table2 = new Table([2, 'item', 'sample']);
 var tableList = new TableList(1, { 1: table1, 2: table2});
-tableList.set(2);
-var pk = tableList.getPK(); // 2
+
+tableList.setPK(2);
+tableList.getPK(); // 2
 ```
 
-### .getPK()
+### List.getPK()
 
 ```js
 /*
@@ -519,11 +547,12 @@ var pk = tableList.getPK(); // 2
 var table1 = new Table([1, 'user', 'sample']);
 var table2 = new Table([2, 'item', 'sample']);
 var tableList = new TableList(1, { 1: table1, 2: table2});
-tableList.set(2);
-var pk = tableList.getPK(); // 2
+
+tableList.setPK(2);
+tableList.getPK(); // 2
 ```
 
-### .reset([list])
+### List.reset([list])
 
 ```js
 /*
@@ -547,7 +576,7 @@ this.toDelSyncList = []; // []
 this.toUpdateSyncList = []; // []
 ```
 
-### .add(child)
+### List.add(child)
 
 ```js
 /*
@@ -559,15 +588,14 @@ var table2 = new Table([2, 'item', 'sample']);
 var tableList = new TableList(1, { 1: table1 });
 
 tableList.add(table2);
-
 // table2 won't in tableList.list, it appears in toAddList
 ```
 
-### .del(input)
+### List.del(input)
 
 ```js
 /*
-@param object || number input
+@param number || object input
 @return void
 */
 var table1 = new Table([1, 'user', 'sample']);
@@ -576,11 +604,10 @@ var tableList = new TableList(1, { 1: table1, 2: table2 });
 
 tableList.del(table2);
 tableList.del(1);
-
 // table1 table2 won't delete from tableList.list, it appears in toDelList
 ```
 
-### .update(child)
+### List.update(child)
 
 ```js
 /*
@@ -593,11 +620,10 @@ var tableList = new TableList(1, { 1: table1, 2: table2 });
 
 table1.name = 'nameChanged';
 tableList.update(table1);
-
 // table1 will change in tableList.list, also appears in toUpdateList
 ```
 
-### .get(pk)
+### List.get(pk)
 
 ```js
 /*
@@ -608,10 +634,10 @@ var table1 = new Table([1, 'user', 'sample']);
 var table2 = new Table([2, 'item', 'sample']);
 var tableList = new TableList(1, { 1: table1, 2: table2 });
 
-var tableMirror = TableList.get(1);
+TableList.get(1); // table1
 ```
 
-### .set(child)
+### List.set(child)
 
 ```js
 /*
@@ -623,11 +649,10 @@ var table2 = new Table([2, 'item', 'sample']);
 var tableList = new TableList(1, { 1: table1 });
 
 tableList.set(table2);
-
 // .set() will not change toAddList,toDelList,toUpdateList, it change tableList.list directly
 ```
 
-### .unset(input)
+### List.unset(input)
 
 ```js
 /*
@@ -640,11 +665,10 @@ var tableList = new TableList(1, { 1: table1 });
 
 tableList.unset(1);
 tableList.unset(table2);
-
 // .unset() will not change toAddList,toDelList,toUpdateList, it change tableList.list directly
 ```
 
-###. getKeys()
+### List.getKeys()
 
 ```js
 /*
@@ -652,15 +676,14 @@ tableList.unset(table2);
 @return array
 */
 var table1 = new Table([1, 'user', 'sample']);
-var table2 = new Table([3, 'item', 'sample']);
+var table3 = new Table([3, 'item', 'sample']);
 var tableList = new TableList(1, { 1: table1 });
 
 tableList.getKeys(); // [1, 3];
-
-// you can use this API forEach: tableList.getKeys().forEach(function() { something });
+// you can use this API chain to forEach: tableList.getKeys().forEach(function() { something });
 ```
 
-###. getList()
+### List.getList()
 
 ```js
 /*
@@ -668,13 +691,13 @@ tableList.getKeys(); // [1, 3];
 @return object
 */
 var table1 = new Table([1, 'user', 'sample']);
-var table2 = new Table([3, 'item', 'sample']);
-var tableList = new TableList(1, { 1: table1 });
+var table3 = new Table([3, 'item', 'sample']);
+var tableList = new TableList(1, { 1: table1, 3: table3 });
 
-tableList.getList(); // {1: table1, 3: table2 };
+tableList.getList(); // {1: table1, 3: table3 };
 ```
 
-### .toAbbArray([filterOn])
+### List.toAbbArray([filterOn])
 
 ```js
 /*
@@ -682,8 +705,8 @@ tableList.getList(); // {1: table1, 3: table2 };
 @return object
 */
 var table1 = new Table([1, 'user', 'sample']);
-var table2 = new Table([3, 'item', 'sample']);
-var tableList = new TableList(1, { 1: table1, 2: table2 });
+var table3 = new Table([3, 'item', 'sample']);
+var tableList = new TableList(1, { 1: table1, 3: table3 });
 
 tableList.toAbbArray(); // {1: { i: 1, n: 'user', d: 'sample' }, 3: { i: 3, n: 'item', d: 'sample' }};
 
@@ -691,7 +714,7 @@ tableList.toAbbArray(); // {1: { i: 1, n: 'user', d: 'sample' }, 3: { i: 3, n: '
 tableList.toAbbArray(true); // {1: { i: 1, n: 'user'}, 3: { i: 3, n: 'item'}};
 ```
 
-### .toArray([filterOn])
+### List.toArray([filterOn])
 
 ```js
 /*
@@ -699,8 +722,8 @@ tableList.toAbbArray(true); // {1: { i: 1, n: 'user'}, 3: { i: 3, n: 'item'}};
 @return object
 */
 var table1 = new Table([1, 'user', 'sample']);
-var table2 = new Table([3, 'item', 'sample']);
-var tableList = new TableList(1, { 1: table1, 2: table2 });
+var table3 = new Table([3, 'item', 'sample']);
+var tableList = new TableList(1, { 1: table1, 3: table3 });
 
 tableList.toArray(); // {1: { id: 1, name: 'user', description: 'sample' }, 3: { id: 3, name: 'item', description: 'sample' }};
 
@@ -708,39 +731,39 @@ tableList.toArray(); // {1: { id: 1, name: 'user', description: 'sample' }, 3: {
 tableList.toArray(true); // {1: { id: 1, name: 'user' }, 3: { id: 3, name: 'item' }};
 ```
 
-### .fromAbbArray(data[, resetUpdateList])
+### List.fromAbbArray(data[, resetUpdateList])
 
 ```js
 /*
-@param object || data
+@param object data
 @param boolean || undefined resetUpdateList
 @return object
 */
 var tableList = new TableList(1);
-var data = {1: { i: 1, n: 'user', d: 'sample' }, 3: { i: 3, n: 'item', d: 'sample' }};
+var data = { 1: { i: 1, n: 'user', d: 'sample' }, 3: { i: 3, n: 'item', d: 'sample' } };
 tableList.fromAbbArray(data);
 
 // or
 tableList.fromAbbArray(data, true);
 ```
 
-### .fromArray(data[, resetUpdateList])
+### List.fromArray(data[, resetUpdateList])
 
 ```js
 /*
-@param object || data
+@param object data
 @param boolean || undefined resetUpdateList
 @return object
 */
 var tableList = new TableList(1);
-var data = {1: { id: 1, name: 'user', description: 'sample' }, 3: { id: 3, name: 'item', description: 'sample' }};
+var data = { 1: { id: 1, name: 'user', description: 'sample' }, 3: { id: 3, name: 'item', description: 'sample' } };
 tableList.fromArray(data);
 
 // or
 tableList.fromArray(data, true);
 ```
 
-### .last()
+### List.last()
 
 ```js
 /*
@@ -748,13 +771,14 @@ tableList.fromArray(data, true);
 @return void
 */
 var table1 = new Table([1, 'user', 'sample']);
-var table2 = new Table([3, 'item', 'sample']);
-var tableList = new TableList(1, { 1: table1, 3: table2 });
+var table3 = new Table([3, 'item', 'sample']);
+var table10 = new Table([10, 'last', 'sample']);
+var tableList = new TableList(1, { 1: table1, 3: table3, 10: table10 });
 
-var lastTable = tableList.last(); // table2
+var lastTable = tableList.last(); // table10
 ```
 
-### .backup()
+### List.backup()
 
 ```js
 /*
@@ -762,13 +786,13 @@ var lastTable = tableList.last(); // table2
 @return object
 */
 var table1 = new Table([1, 'user', 'sample']);
-var table2 = new Table([3, 'item', 'sample']);
-var tableList = new TableList(1, { 1: table1, 3: table2 });
+var table3 = new Table([3, 'item', 'sample']);
+var tableList = new TableList(1, { 1: table1, 3: table3 });
 
-var bak = tableList.backup(); // { type: 'List', className: 'TableList', pk: 1, data: {1: { i: 1, n: 'user', d: 'sample' }, 3: { i: 3, n: 'item', d: 'sample' }} };
+tableList.backup(); // { type: 'List', className: 'TableList', pk: 1, data: {1: { i: 1, n: 'user', d: 'sample' }, 3: { i: 3, n: 'item', d: 'sample' }} };
 ```
 
-### .restore(bak)
+### List.restore(bak)
 
 ```js
 /*
@@ -776,11 +800,11 @@ var bak = tableList.backup(); // { type: 'List', className: 'TableList', pk: 1, 
 @return void
 */
 var tableList = new TableList(1);
-var bak = { type: 'List', className: 'TableList', pk: 1, data: {1: { i: 1, n: 'user', d: 'sample' }, 3: { i: 3, n: 'item', d: 'sample' }} };
+var bak = { type: 'List', className: 'TableList', pk: 1, data: {1: { i: 1, n: 'user', d: 'sample' }, 3: { i: 3, n: 'item', d: 'sample' } } };
 tableList.restore(bak);
 ```
 
-### .restoreSync(bak)
+### List.restoreSync(bak)
 
 ```js
 /*
@@ -795,7 +819,7 @@ dataPool.set('tableList', 1);
 dataPool.sync();
 ```
 
-### *SyncAPI* .addSync(child)
+### List.addSync(child) *SyncAPI*
 
 ```js
 /*
@@ -811,7 +835,7 @@ tableList.addSync(table1);
 dataPool.sync(); // this will add table1 to redis
 ```
 
-### *SyncAPI* .delSync(input)
+### List.delSync(input) *SyncAPI*
 
 ```js
 /*
@@ -839,7 +863,7 @@ tableList.delSync(3);
 dataPool.sync(); // this will del 2 tables from redis
 ```
 
-### *SyncAPI* .updateSync(child)
+### List.updateSync(child) *SyncAPI*
 
 ```js
 /*
@@ -867,12 +891,12 @@ tableList.updateSync(table1);
 dataPool.sync(); // this will update table1 to redis
 ```
 
-### *SyncAPI* .markDelSync()
+### List.markDelSync() *SyncAPI*
 PRIVATE API FOR DataPool
 
 ## 4、PKStore.js
 
-### .get(cb);
+### PKStore.get(cb);
 
 ```js
 /*
@@ -889,7 +913,7 @@ TablePKStore.get(function(err, tablePK) {
 });
 ```
 
-### .set(pk[, cb])
+### PKStore.set(pk[, cb])
 
 ```js
 /*
@@ -910,7 +934,7 @@ TablePKStore.set(tablePK, function(err, redisResult) {
 // this will set a STRING to redis, key: 'I-GK-t', value: 22
 ```
 
-### .unset(pk[, cb])
+### PKStore.unset(pk[, cb])
 
 ```js
 /*
@@ -937,12 +961,12 @@ TablePKStore.get(function(err, tablePK) {
 // this will remove key: 'I-GK-t' from redis
 ```
 
-### *SyncAPI* .sync()
+### PKStore.sync() *SyncAPI*
 PRIVATE API FOR DataPool
 
 ## 5、ModelStore.js
 
-### .get(pk, cb)
+### ModelStore.get(pk, cb)
 
 ```js
 /*
@@ -960,7 +984,7 @@ TableStore.get(1, function(err, table) {
 });
 ```
 
-### .add(model[, cb])
+### ModelStore.add(model[, cb])
 
 ```js
 /*
@@ -977,11 +1001,10 @@ TableStore.add(table, function(err, table, redisResult) {
 
     // something with table or redisResult
 });
-
 // this will add a HASH to redis, key: 't-1', fields: [0, 1, 2], values:['1', 'user', 'sample']
 ```
 
-### .del(input[, cb])
+### ModelStore.del(input[, cb])
 
 ```js
 /*
@@ -998,10 +1021,8 @@ TableStore.del(1, function(err, redisResult) {
     // something with redisResult
 });
 
-// this will remove a HASH from redis, key: 't-1'
-
 // also can
-var table = new Table(['1', 'name', 'description']);
+var table = new Table([1, 'name', 'description']);
 TableStore.del(table, function(err, redisResult) {
     if (err) {
         // something
@@ -1010,11 +1031,10 @@ TableStore.del(table, function(err, redisResult) {
 
     // something with redisResult
 });
-
-// same effect
+// both will remove a HASH from redis, key: 't-1'
 ```
 
-### .update(model[, cb])
+### ModelStore.update(model[, cb])
 
 ```js
 /*
@@ -1034,16 +1054,15 @@ TableStore.get(1, function(err, table) {
         // something with table or redisResult
     });
 });
-
-// this will update a HASH to redis, key: 't-1', field: '1', value: 'nameChanged'
+// this will update a HASH field to redis, key: 't-1', field: '1', value: 'nameChanged'
 ```
 
-### *SyncAPI* .sync()
+### ModelStore.sync() *SyncAPI*
 PRIVATE API FOR DataPool
 
 ## 6、ListStore.js
 
-### .get(pk, cb)
+### ListStore.get(pk, cb)
 
 ```js
 /*
@@ -1063,7 +1082,7 @@ TableListStore.get(1, function(err, tableList) {
 // this will get 'tl-1', 't1', 't3' from redis and make a TableList instance
 ```
 
-### .del(list[, cb])
+### ListStore.del(list[, cb])
 
 ```js
 /*
@@ -1087,10 +1106,10 @@ TableListStore.get(1, function(err, tableList) {
     });
 });
 
-// this will del 'tl-1', 't1', 't3' from redis and return a empty TableList instance
+// this will del 'tl-1', 't1', 't3' from redis and make a empty TableList instance
 ```
 
-### .update(list[, cb])
+### ListStore.update(list[, cb])
 
 ```js
 /*
@@ -1114,6 +1133,7 @@ TableListStore.get(1, function(err, tableList) {
     // update a table
     var table3 = tableList.get(3);
     table3.name = 'nameChanged';
+    tableList.update(table3);
 
     TableListStore.update(tableList, function(err, list, redisResult) {
         if (err) {
@@ -1135,5 +1155,144 @@ TableListStore.get(1, function(err, tableList) {
 // to redis
 ```
 
-### *SyncAPI* .sync()
+### ListStore.sync() *SyncAPI*
 PRIVATE API FOR DataPool
+
+# View层概述及运行机理
+
+### Server端View层
+就Server来看，view层可以忽略不计，多数情况只需JSON.stringify即可满足需求。虽然I Framework的服务端中包含Jade模板引擎，但还是强烈建议服务端只处理数据，渲染交给客户端来执行。
+
+### Client端View层
+Client端，由于view层千变万化，因此没做任何封装。渲染HTML可以直接使用Renderer.js。该类将Jade进行了一层封装，会将模板进行缓存，提高运行效率。以下是个简单的Sample
+
+Index.jade
+```jade
+h2 Wendy
+p #{text}
+```
+
+IndexView.js
+```js
+var IndexView = function IndexView() {
+    this.renderAll = renderAll(text) {
+        var html = Renender.make('Index'/* means get Index.jade */, { text: 'Welcome to the United States of America, have a nice day' });
+        $('body').empty().html(html);
+    };
+};
+```
+
+main.js
+```js
+$(function() {
+    var indexView = new IndexView();
+    indexView.renderAll();
+});
+```
+
+更详尽的使用范例可以参考：[PCS](https://github.com/himulawang/pcs)
+
+# Controller层概述及运行机理
+
+### Server端Controller层
+通过配置routes.js来完成
+
+···js
+C0001: {
+    ctrl: 'Table',
+    action: 'Update'
+    param: {
+        id: 'ni',
+        name: 'ns',
+        description: 'ns',
+    },              
+},                  
+```
+
+* ctrl: 控制器名，会根据该名称寻找Controller文件，如上述配置就会自动寻找TableController.js
+* action: 动作名，会根据该名字寻找Controller文件下的方法，上述配置会自动寻找Update方法
+* param: 传入参数，由两个字母组成，前一个字母为m e n标识存在与否，后一个字母i s h a标识类型
+  * m: Miss参数允许不存在
+  * e: Empty参数允许为空字符串
+  * n: NotEmpty参数不允许为空字符串
+  * i: Int参数为数字
+  * s: String参数为数字
+  * h: Hash参数为哈希数组如：{ name: 'time', description: 'sample' }
+  * a: Array参数为数组如：[0, 1, 3, 9];
+
+以Websocket为范例Server Controller如下：
+
+```js
+var WebSocketServer = require('websocket').server;
+var routes = require('./config/routes.js').routes;
+
+var ws = new WebSocketServer({
+    httpServer: server,
+});
+var Route = new I.Route(routes);
+
+global.connectionPool = new I.ConnectionPool();
+ws.on('request', function(req) {
+    var connection = req.accept('i', req.origin);
+    connectionPool.push(connection);
+
+    console.log(connection.remoteAddress + " connected - Protocol Version " + connection.webSocketVersion);
+
+    connection.on('close', function(reasonCode, description) {
+        console.log(reasonCode, description);
+        connectionPool.remove(connection);
+    });
+
+    connection.on('message', function(message) {
+        var start = process.hrtime();
+
+        if (message.type === 'binary') return;
+        var req = JSON.parse(message.utf8Data);
+
+        try {
+            Route.process(connection, req);
+        } catch (e) {
+            console.log('Error', e);
+        }
+    });
+});
+```
+
+Route.process(connection, req);会先检查传入参数，通过后自动找到对应Controller下的方法并执行。
+
+### Client端Controller层
+
+通过route.js来完成
+
+···js
+C0001: {
+    ctrl: 'Table',
+    action: 'Update'         
+},                  
+```
+
+Client端的routes.js没有param参数，服务端传回数据默认为可信，没必要验证。
+
+WebSocket.js会将传回信息自动解析并执行对应Controller下的方法。
+
+注：按照上述配置，TableController下的onUpdate方法会被执行。
+
+## TODO
+
+1. Doc Exception
+2. Doc Util
+3. Doc LogicController
+
+## Acknowledgement
+
+- node.js: http://nodejs.org/
+- Redis: http://redis.io/
+- Chrome: https://www.google.com/intl/en/chrome/browser/
+- node.js lib
+    - express: https://github.com/visionmedia/express
+    - hiredis: https://github.com/redis/hiredis
+    - node_redis: https://github.com/mranney/node_redis
+    - WebSocket-Node: https://github.com/Worlize/WebSocket-Node
+- bootstrap: https://github.com/twitter/bootstrap
+- jquery: http://jquery.com/
+- jade: https://github.com/visionmedia/jade
