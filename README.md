@@ -1,12 +1,16 @@
 ParaNoidz I Framework
 ===
-[Model层](#Model层)
+* [Model层](#model)
+  * [orm.js配置](#ormjs)
+  * [自动生成模型文件](#createmodelfilesautomatically)
+  * [继承顺序](#inherits)
+* [Model API](#modelapi)
 
 基于纯Javascript平台的MVC框架，为简洁和效率而生。
 
 ## Model层
 
-### 配置
+### orm.js配置
 Model主要由orm.js配置生成
 
 ```js
@@ -39,7 +43,7 @@ Model主要由orm.js配置生成
 * pkAutoIncrement: pk需要自增时，置为true，框架会自动为新增Model分配全局唯一Id作为pk
 * list: List名，server启动会根据name生成对应List文件
 
-### 自动生成
+### Create Model Files Automatically 自动生成模型文件
 orm.js配置完，重启server，框架会根据配置自动生成如下Model文件（若文件已存在，则跳过）。
 
 * TablePK.js
@@ -49,7 +53,7 @@ orm.js配置完，重启server，框架会根据配置自动生成如下Model文
 * TableList.js
 * TableListStore.js
 
-### 继承顺序
+### Inherits 继承顺序
 
 I Framework中分3类模型，PK、Model、List。
 
@@ -81,7 +85,7 @@ PK.js、Model.js、List.js拥有最基础的API。
 
 Store结尾的类文件用于和Redis进行交互，将3类模型文件转化为Redis指令进行存取。
 
-# API
+# Model API
 注：Model API分两种，异步模式和同步模式。
 
 区别在于：
@@ -1037,7 +1041,7 @@ TableStore.get(1, function(err, table) {
 ### *SyncAPI* .sync()
 PRIVATE API FOR DataPool
 
-## ListStore.js
+## 6、ListStore.js
 
 ### .get(pk, cb)
 
