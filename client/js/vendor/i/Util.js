@@ -228,14 +228,6 @@
         isChecked: function isChecked(el) {
             return $(el).attr('checked') ? 1 : 0;
         },
-        fsRead: function fsRead(file, cb) {
-            var reader = new FileReader();
-
-            reader.onload = function(e) {
-                cb(this.result);
-            };
-            reader.readAsText(file);
-        },
     };
 
     Util.require('Util', '', Util);
