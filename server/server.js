@@ -16,7 +16,7 @@ var ws = new WebSocketServer({
 global.connectionPool = new I.ConnectionPool();
 var Route = new I.Route(routes);
 ws.on('request', function(req) {
-    var connection = req.accept('pcs', req.origin);
+    var connection = req.accept('i', req.origin);
     connectionPool.push(connection);
 
     console.log(connection.remoteAddress + " connected - Protocol Version " + connection.webSocketVersion);

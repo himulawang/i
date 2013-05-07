@@ -1,12 +1,12 @@
 exports.orms = [
-/*
 {
-    name: 'Table',
-    abb: 't',
+    name: 'Connection',
+    abb: 'c',
     column: [
         'id',
         'name',
-        'description',
+        'host',
+        'port',
     ],
     toAddFilter: [],
     toUpdateFilter: [0],
@@ -14,7 +14,7 @@ exports.orms = [
     toArrayFilter: [],
     pk: 'id',
     pkAutoIncrement: true,
-    list: 'TableList',
+    list: 'ConnectionList',
+    storeType: 'Redis',
 },
-*/
 ];

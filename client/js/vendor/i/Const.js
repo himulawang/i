@@ -13,6 +13,9 @@ var I = {
             PARAM_TYPE_STRING: 's',
             PARAM_TYPE_HASH: 'h',
             PARAM_TYPE_ARRAY: 'a',
+
+            // indexed db
+            INDEXED_DB_PK_TABLE: 'I-PK',
         },
     },
 };

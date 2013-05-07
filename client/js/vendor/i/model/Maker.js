@@ -8,6 +8,7 @@
 
         var self = this;
         this.classes = {};
+        this.indexedDBCallbacks = [];
 
         orms.forEach(function(orm) {
             self.makeModelBaseClass(orm);
@@ -17,14 +18,14 @@
     Maker.prototype.makeModelBaseClass = function makeModelBaseClass(orm) {
         // pk
         this.makePKClass(orm);
-        if (global) this.makePKStoreClass(orm);
+        if (global && orm.storeType) this.makePKStoreClass(orm);
         // model
         this.makeModelClass(orm);
-        if (global) this.makeModelStoreClass(orm);
+        if (global && orm.storeType) this.makeModelStoreClass(orm);
         // list
         if (orm.list) {
             this.makeListClass(orm);
-            if (global) this.makeListStoreClass(orm);
+            if (global && orm.storeType) this.makeListStoreClass(orm);
         }
     };
 
@@ -50,6 +51,8 @@
     /* Maker */
     Maker.prototype.makePKClass = function makePKClass(orm) {
         var content = '';
+        content += "this.className = '" + orm.name + "PK';\n";
+        content += "this.getStore = function getStore() { return I.Models." + orm.name + "PKStore; };";
 
         var Class = new Function('pk', content);
 
@@ -61,13 +64,14 @@
 
     Maker.prototype.makePKStoreClass = function makePKStoreClass(orm) {
         var content = '';
-        content += "this.key = '" + I.Const.GLOBAL_KEY_PREFIX + orm.abb + "';\n";
+        content += "this.className = '" + orm.name + "PKStore';\n";
+        content += "this.key = '" + I.Const.Frame.GLOBAL_KEY_PREFIX + orm.abb + "';\n";
         content += "this.getModel = function getModel() { return I.Models." + orm.name + "PK; };\n";
         content += "this.modelName = '" + orm.name + "';\n";
 
         var Class = new Function('pk', content);
 
-        Class.prototype = new I.Models.PKStore();
+        Class.prototype = new I.Models['PK' + orm.storeType + 'Store']();
         Class.prototype.constructor = Class;
 
         this.classes[orm.name + 'PKStoreBase'] = Class;
@@ -78,7 +82,9 @@
 
         // class create
         var content = '';
+        content += "this.className = '" + orm.name + "';\n";
         content += "this.pk = '" + orm.pk + "';\n";
+        content += "this.getStore = function getStore() { return I.Models." + orm.name + "Store; };\n";
 
         // column
         var columns = [];
@@ -133,6 +139,7 @@
     Maker.prototype.makeModelStoreClass = function makeModelStoreClass(orm) {
         // class create
         var content = '';
+        content += "this.className = '" + orm.name + "Store';\n";
         content += "this.getModel = function getModel() { return I.Models." + orm.name + "; };\n";
         content += "this.modelName = '" + orm.name + "';\n";
         content += "this.pk = '" + orm.pk + "';\n";
@@ -142,7 +149,7 @@
         var Class = new Function(content);
 
         // extends
-        Class.prototype = new I.Models.ModelStore();
+        Class.prototype = new I.Models['Model' + orm.storeType + 'Store']();
         Class.prototype.constructor = Class;
 
         this.classes[orm.name + 'StoreBase'] = Class;
@@ -151,6 +158,8 @@
     Maker.prototype.makeListClass = function makeListClass(orm) {
         // class create
         var content = '';
+        content += "this.className = '" + orm.list + "';\n";
+        content += "this.getStore = function getStore() { return I.Models." + orm.list + "Store; };\n";
         content += "this.getChildModel = function getChildModel() { return I.Models." + orm.name + "; };\n";
         content += "this.childModelName = '" + orm.name + "';\n";
 
@@ -166,6 +175,7 @@
     Maker.prototype.makeListStoreClass = function makeListStoreClass(orm) {
         // class create
         var content = '';
+        content += "this.className = '" + orm.list + "List';\n";
         content += "this.abb = '" + orm.abb + "l';\n";
 
         content += "this.getListModel = function getListModel() { return I.Models." + orm.list + "; };\n";
@@ -180,7 +190,7 @@
         var Class = new Function(content);
 
         // extends
-        Class.prototype = new I.Models.ListStore();
+        Class.prototype = new I.Models['List' + orm.storeType + 'Store']();
         Class.prototype.constructor = Class;
 
         this.classes[orm.list + 'StoreBase'] = Class;
@@ -222,7 +232,8 @@
     };
 
     /* Creator */
-    Maker.prototype.createFiles = function createFiles(orms, dir) {
+    /* Server */
+    Maker.prototype.createServerFiles = function createServerFiles(orms, dir) {
         var self = this;
 
         // check dir exist
@@ -232,20 +243,20 @@
 
         orms.forEach(function(orm) {
             // pk
-            self.createPKFile(orm, dir);
-            self.createPKStoreFile(orm, dir);
+            self.createServerPKFile(orm, dir);
+            self.createServerPKStoreFile(orm, dir);
             // model
-            self.createModelFile(orm, dir);
-            self.createModelStoreFile(orm, dir);
+            self.createServerModelFile(orm, dir);
+            self.createServerModelStoreFile(orm, dir);
             // list
             if (orm.list) {
-                self.createListFile(orm, dir);
-                self.createListStoreFile(orm, dir);
+                self.createServerListFile(orm, dir);
+                self.createServerListStoreFile(orm, dir);
             }
         });
     };
 
-    Maker.prototype.createPKFile = function createPKFile(orm, dir) {
+    Maker.prototype.createServerPKFile = function createServerPKFile(orm, dir) {
         var pkName = orm.name + 'PK';
         var content = "/* This file is generated by IFramework - Maker.js for user to rewrite PK file */\n";
         content += "!function () {\n";
@@ -266,7 +277,7 @@
         this.writeFile(pkName + '.js', content, dir, false);
     };
 
-    Maker.prototype.createPKStoreFile = function createPKStoreFile(orm, dir) {
+    Maker.prototype.createServerPKStoreFile = function createServerPKStoreFile(orm, dir) {
         var pkStoreName = orm.name + 'PKStore';
         var content = "/* This file is generated by IFramework - Maker.js for user to rewrite PKStore file */\n";
         content += "!function () {\n";
@@ -287,7 +298,7 @@
         this.writeFile(pkStoreName + '.js', content, dir, false);
     };
 
-    Maker.prototype.createModelFile = function createModelFile(orm, dir) {
+    Maker.prototype.createServerModelFile = function createServerModelFile(orm, dir) {
         var content = "/* This file is generated by IFramework - Maker.js for user to rewrite Model file */\n";
         content += "!function () {\n";
         content += "    var " + orm.name + " = function " + orm.name + "(args) {\n";
@@ -307,7 +318,7 @@
         this.writeFile(orm.name + '.js', content, dir, false);
     };
 
-    Maker.prototype.createModelStoreFile = function createModelStoreFile(orm, dir) {
+    Maker.prototype.createServerModelStoreFile = function createServerModelStoreFile(orm, dir) {
         var storeName = orm.name + 'Store';
         var content = "/* This file is generated by IFramework - Maker.js for user to rewrite ModelStore file */\n";
         content += "!function () {\n";
@@ -328,7 +339,7 @@
         this.writeFile(storeName + '.js', content, dir, false);
     };
 
-    Maker.prototype.createListFile = function createListFile(orm, dir) {
+    Maker.prototype.createServerListFile = function createServerListFile(orm, dir) {
         var content = "/* This file is generated by IFramework - Maker.js for user to rewrite List file */\n";
         content += "!function () {\n";
         content += "    var " + orm.list + " = function " + orm.list + "(pk, list) {\n";
@@ -348,7 +359,7 @@
         this.writeFile(orm.list + '.js', content, dir, false);
     };
 
-    Maker.prototype.createListStoreFile = function createListStoreFile(orm, dir) {
+    Maker.prototype.createServerListStoreFile = function createServerListStoreFile(orm, dir) {
         var listStoreName = orm.list + 'Store';
         var content = "/* This file is generated by IFramework - Maker.js for user to rewrite ListStore file */\n";
         content += "!function () {\n";
@@ -367,6 +378,115 @@
         content += "}();";
 
         this.writeFile(listStoreName + '.js', content, dir, false);
+    };
+
+    /* Client */
+    Maker.prototype.createClientFiles = function createClientFiles(orms, dir) {
+        var self = this;
+
+        // check dir exist
+        if (!fs.existsSync(dir)) {
+            fs.mkdir(dir);
+        }
+
+        orms.forEach(function(orm) {
+            // pk
+            self.createClientPKFile(orm, dir);
+            self.createClientPKStoreFile(orm, dir);
+            // model
+            self.createClientModelFile(orm, dir);
+            self.createClientModelStoreFile(orm, dir);
+            /*
+            // list
+            if (orm.list) {
+                self.createClientListFile(orm, dir);
+                self.createClientListStoreFile(orm, dir);
+            }
+            */
+        });
+    };
+
+    Maker.prototype.createClientPKFile = function createClientPKFile(orm, dir) {
+        var pkName = orm.name + 'PK';
+        var content = "/* This file is generated by IFramework - Maker.js for user to rewrite PK file */\n";
+        content += "!function () {\n";
+        content += "    var " + pkName + " = function " + pkName + "(pk) {\n";
+        content += "        this.init.call(this, pk);\n";
+        content += "    };\n";
+        content += "\n";
+
+        // extends
+        content += "    " + pkName + ".prototype = new I.Models." + pkName + "Base();\n";
+        content += "    " + pkName + ".prototype.constructor = " + pkName + ";\n";
+        content += "\n";
+
+        // exports
+        content += "    I.Util.require('" + pkName + "', 'Models', " + pkName + ");\n";
+        content += "}();";
+
+        this.writeFile(pkName + '.js', content, dir, false);
+    };
+
+    Maker.prototype.createClientPKStoreFile = function createClientPKStoreFile(orm, dir) {
+        var pkStoreName = orm.name + 'PKStore';
+        var content = "/* This file is generated by IFramework - Maker.js for user to rewrite PKStore file */\n";
+        content += "I.Maker.indexedDBCallbacks.push(function (db) {\n";
+        content += "    var " + pkStoreName + " = function " + pkStoreName + "(db) {\n";
+        content += "        this.db = db;\n";
+        content += "    };\n";
+        content += "\n";
+
+        // extends
+        content += "    " + pkStoreName + ".prototype = new I.Models." + pkStoreName + "Base();\n";
+        content += "    " + pkStoreName + ".prototype.constructor = " + pkStoreName + ";\n";
+        content += "\n";
+
+        // exports
+        content += "    I.Util.require('" + pkStoreName + "', 'Models', new " + pkStoreName + "(db));\n";
+        content += "});";
+
+        this.writeFile(pkStoreName + '.js', content, dir, false);
+    };
+
+    Maker.prototype.createClientModelFile = function createClientModelFile(orm, dir) {
+        var content = "/* This file is generated by IFramework - Maker.js for user to rewrite Model file */\n";
+        content += "!function () {\n";
+        content += "    var " + orm.name + " = function " + orm.name + "(args) {\n";
+        content += "        this.init.call(this, args);\n";
+        content += "    };\n";
+        content += "\n";
+
+        // extends
+        content += "    " + orm.name + ".prototype = new I.Models." + orm.name + "Base();\n";
+        content += "    " + orm.name + ".prototype.constructor = " + orm.name + ";\n";
+        content += "\n";
+
+        // exports
+        content += "    I.Util.require('" + orm.name + "', 'Models', " + orm.name + ");\n";
+        content += "}();";
+
+        this.writeFile(orm.name + '.js', content, dir, false);
+    };
+
+    Maker.prototype.createClientModelStoreFile = function createClientModelStoreFile(orm, dir) {
+        var storeName = orm.name + 'Store';
+        var content = "/* This file is generated by IFramework - Maker.js for user to rewrite ModelStore file */\n";
+        content += "I.Maker.indexedDBCallbacks.push(function (db) {\n";
+        content += "    var " + storeName + " = function " + storeName + "(db) {\n";
+        content += "    this.db = db;\n";
+        content += "    };\n";
+        content += "\n";
+
+        // extends
+        content += "    " + storeName + ".prototype = new I.Models." + storeName + "Base();\n";
+        content += "    " + storeName + ".prototype.constructor = " + storeName + ";\n";
+        content += "\n";
+
+        // exports
+        content += "    I.Util.require('" + storeName + "', 'Models', new " + storeName + "(db));\n";
+        content += "});";
+
+        this.writeFile(storeName + '.js', content, dir, false);
     };
 
     /* File System*/

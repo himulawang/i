@@ -1,12 +1,13 @@
+!function() {
 var orms = [
-/*
 {
-    name: 'Table',
-    abb: 't',
+    name: 'Connection',
+    abb: 'c',
     column: [
         'id',
         'name',
-        'description',
+        'host',
+        'port',
     ],
     toAddFilter: [],
     toUpdateFilter: [0],
@@ -14,7 +15,15 @@ var orms = [
     toArrayFilter: [],
     pk: 'id',
     pkAutoIncrement: true,
-    list: 'TableList',
+    list: 'ConnectionList',
+    storeType: 'IndexedDB',
 },
-*/
 ];
+
+if (global) {
+    exports.orms = orms;
+} else {
+    window.orms = orms;
+}
+
+}();

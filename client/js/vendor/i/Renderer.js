@@ -15,5 +15,5 @@
             return html;
         },
     };
-    Util.require('Renderer', '', Renderer);
+    I.Util.require('Renderer', '', Renderer);
 }();

@@ -60,5 +60,5 @@
             this.connection.send(JSON.stringify(req));
         };
     };
-    Util.require('WebSocket', '', WS);
+    I.Util.require('WebSocket', '', WS);
 }();
