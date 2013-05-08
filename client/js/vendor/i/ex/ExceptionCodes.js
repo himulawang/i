@@ -86,6 +86,9 @@
         20001: 'Wrong pk set to IndexedDB.',
         20002: 'Wrong pk unset to IndexedDB.',
         20003: 'Wrong model set to IndexedDB.',
+        20004: 'Wrong input unset to IndexedDB.',
+        20005: 'Wrong list update to IndexedDB.',
+        20006: 'Wrong list del to IndexedDB.',
     };
 
     I.Util.require('ExceptionCodes', '', ExceptionCodes);

@@ -1,29 +1,29 @@
 !function() {
-var orms = [
-{
-    name: 'Connection',
-    abb: 'c',
-    column: [
-        'id',
-        'name',
-        'host',
-        'port',
-    ],
-    toAddFilter: [],
-    toUpdateFilter: [0],
-    toAbbFilter: [],
-    toArrayFilter: [],
-    pk: 'id',
-    pkAutoIncrement: true,
-    list: 'ConnectionList',
-    storeType: 'IndexedDB',
-},
-];
+    var orms = [
+    {
+        name: 'Connection',
+        abb: 'c',
+        column: [
+            'id',
+            'name',
+            'host',
+            'port',
+        ],
+        toAddFilter: [],
+        toUpdateFilter: [0],
+        toAbbFilter: [],
+        toArrayFilter: [],
+        pk: 'id',
+        pkAutoIncrement: true,
+        list: 'ConnectionList',
+        storeType: 'IndexedDB',
+    },
+    ];
 
-if (global) {
-    exports.orms = orms;
-} else {
-    window.orms = orms;
-}
-
+    if (I.Util.isBrowser()) {
+        I.Util.require('orms', '', orms);
+    } else {
+        // for server to create model files
+        exports.orms = orms;
+    }
 }();

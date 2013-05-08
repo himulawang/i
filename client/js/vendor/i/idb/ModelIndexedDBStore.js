@@ -8,16 +8,19 @@
     };
 
     ModelIndexedDBStore.prototype.get = function get(pk, cb) {
-        this.db.get(this.modelName, pk, function(obj) {
+        this.db.get(this.modelName, pk, function(data) {
             var modelClass = this.getModel();
             var model = new modelClass();
-            model.fromArray(obj);
+
+            if (data !== undefined) {
+                model.fromArray(data, true);
+            }
 
             cb(model);
         }.bind(this));
     };
 
-    ModelIndexedDBStore.prototype.set = function set(model, cb) {
+    ModelIndexedDBStore.prototype.add = function add(model, cb) {
         if (model instanceof this.getModel() === false) throw new I.Exception(20003);
         cb = cb || function() {};
 
@@ -27,15 +30,19 @@
         });
     };
 
-    /*
-    ModelIndexedDBStore.prototype.unset = function unset(pk, cb) {
+    ModelIndexedDBStore.prototype.del = function del(input, cb) {
+        var key;
+        if (I.Util.isString(input) || I.Util.isInt(input)) {
+            key = input;
+        } else if (input instanceof this.getModel()){
+            key = input.getPK();
+        } else {
+            throw new I.Exception(20004);
+        }
         cb = cb || function() {};
-        if (pk instanceof this.getModel() === false) return cb(new I.Exception(20002));
-        this.db.del(I.Const.Frame.INDEXED_DB_PK_TABLE, this.modelName + 'PK', cb);
+
+        this.db.del(this.modelName, key, cb);
     };
-    */
 
     I.Util.require('ModelIndexedDBStore', 'Models', ModelIndexedDBStore);
 }();
-
-

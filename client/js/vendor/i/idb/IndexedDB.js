@@ -11,15 +11,16 @@
         var req = indexedDB.open(name, version);
 
         req.onupgradeneeded = function(e) {
-            console.log('IndexedDB upgraded.');
-
+            console.log('IndexedDB Upgraded');
             var db = e.target.result;
-            // create PK table
-            this.resetTable(db, I.Const.Frame.INDEXED_DB_PK_TABLE, 'name');
 
+            // create PK table
+            this.resetTable(db, I.Const.IDB.PK_TABLE, 'name');
+
+            // create orm tables
             orms.forEach(function(orm) {
                 if (orm.storeType !== 'IndexedDB') return;
-                this.resetTable(db, orm.name, orm.pk);
+                this.resetTable(db, orm.name, orm.pk, I.Const.IDB.LIST_COLUMN_NAME, false);
             }.bind(this));
 
             e.target.transaction.onerror = this.onerror;
@@ -28,7 +29,7 @@
         }.bind(this);
 
         req.onsuccess = function(e) {
-            console.log('IndexedDB opened.');
+            console.log('IndexedDB Opened');
             this.db = e.target.result;
 
             // make ModelBaseStore
@@ -36,6 +37,7 @@
             orms.forEach(function(orm) {
                 I.Maker.makePKStoreClass(orm);
                 I.Maker.makeModelStoreClass(orm);
+                I.Maker.makeListStoreClass(orm);
             }.bind(this));
 
             for (var i in I.Maker.classes) {
@@ -62,7 +64,33 @@
         req.onerror = this.onerror;
     };
 
+    IndexedDB.prototype.getList = function getList(table, listId, cb) {
+        var trans = this.db.transaction([table], "readonly");
+        trans.onerror = this.onerror;
+
+        var store = trans.objectStore(table);
+        var index = store.index(I.Const.Frame.INDEXED_DB_LIST_COLUMN_NAME);
+
+        var results = [];
+        var cursorReq = index.openCursor(listId);
+        cursorReq.onsuccess = function(e) {
+            var cursor = cursorReq.result;
+            if (cursor) {
+                var req = store.get(cursor.primaryKey);
+                req.onsuccess = function() {
+                    results.push(req.result);
+                };
+                cursor.continue();
+            }
+        };
+
+        trans.oncomplete = function () {
+            cb(results);
+        }
+    };
+
     IndexedDB.prototype.set = function set(table, obj, cb) {
+        cb = cb || function() {};
         var trans = this.db.transaction([table], "readwrite");
         trans.onerror = this.onerror;
 
@@ -72,6 +100,7 @@
     };
 
     IndexedDB.prototype.del = function del(table, key, cb) {
+        cb = cb || function() {};
         var trans = this.db.transaction([table], "readwrite");
         trans.onerror = this.onerror;
 
@@ -80,12 +109,36 @@
         req.onerror = this.onerror;
     };
 
-    IndexedDB.prototype.resetTable = function resetTable(db, table, keyPath) {
+    IndexedDB.prototype.delList = function delList(table, listId, cb) {
+        var trans = this.db.transaction([table], "readwrite");
+        trans.onerror = this.onerror;
+
+        var store = trans.objectStore(table);
+        var index = store.index(I.Const.Frame.INDEXED_DB_LIST_COLUMN_NAME);
+
+        var cursorReq = index.openCursor(listId);
+        cursorReq.onsuccess = function(e) {
+            var cursor = cursorReq.result;
+            if (cursor) {
+                var req = store.delete(cursor.primaryKey);
+                cursor.continue();
+            }
+        };
+
+        trans.oncomplete = function () {
+            cb();
+        }
+    };
+    
+    IndexedDB.prototype.resetTable = function resetTable(db, table, keyPath, index, indexUnique) {
         if (db.objectStoreNames.contains(table)) {
             db.deleteObjectStore(table);
         }
 
-        db.createObjectStore(table, { keyPath: keyPath });
+        var objectStore = db.createObjectStore(table, { keyPath: keyPath });
+        if (index !== undefined) {
+            objectStore.createIndex(index, index, { unique: indexUnique });
+        }
     };
 
     I.Util.require('IndexedDB', 'Models', IndexedDB);

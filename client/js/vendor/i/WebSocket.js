@@ -17,39 +17,39 @@
 
         this.connect = function connect() {
             this.connection = new WebSocket(this.url, this.protocol);
-            var self = this;
 
             this.connection.onopen = function() {
-                console.log('open');
-                self.onopen();
-            };
+                console.log('Websocket Opened');
+                this.onopen();
+            }.bind(this);
 
             this.connection.onerror = function(error) {
-                console.log('error', error);
-                self.onerror();
-            };
+                console.log('Websocket Error', error);
+                this.onerror();
+            }.bind(this);
 
             this.connection.onclose = function(error) {
-                console.log('close', error);
-                self.onclose();
+                console.log('Websocket Closed', error);
+                this.onclose();
                 setTimeout(function() {
-                    self.connect();
-                }, 800);
-            };
+                    this.connect();
+                }.bind(this), 800);
+            }.bind(this);
 
             this.connection.onmessage = function(message) {
                 var res = JSON.parse(message.data);
-                if (res.r !== 0) throw new Exception(res.r);
+                if (res.r !== 0) throw new I.Exception(res.r);
 
-                var route = routes[res.a];
-                console.log('api:', res.a, 'code', res.r, 'data:', res.d);
-                window[route.ctrl + 'Controller']['on' + route.action](res.d);
+                var route = I.routes[res.a];
+                console.log('Websocket Incoming: api:', res.a, 'code', res.r, 'data:', res.d);
+
+                I.Ctrl[route.ctrl + 'Controller']['on' + route.action](res.d);
             };
         };
 
         this.send = function send(api, param) {
             if (this.connection.readyState !== WebSocket.OPEN) {
-                console.log('u r offline, cannot send message to server.');
+                console.log('Websocket Disconnected, cannot send message to server.');
                 return;
             }
             param = param || {};

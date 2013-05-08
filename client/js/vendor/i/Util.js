@@ -214,7 +214,14 @@
         },
         /* Loader */
         require: function require(name, path, object) {
-            var field = global || window;
+            var field;
+            if (this.isBrowser()) {
+                field = window;
+            } else {
+                field = global;
+            }
+
+            if (!field.I) field.I = {};
             if (path) {
                 if (!field.I[path]) {
                     field.I[path] = {};
@@ -222,6 +229,15 @@
                 field.I[path][name] = object;
             } else {
                 field.I[name] = object;
+            }
+        },
+        isBrowser: function() {
+            var field;
+            try {
+                field = global;
+                return false;
+            } catch (e) {
+                return true;
             }
         },
         /* Client */
