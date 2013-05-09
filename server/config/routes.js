@@ -1,12 +1,8 @@
 exports.routes = {
-/*
-    C0001: {                          
+    C0002: {                          
         ctrl: 'Net',                  
-        action: 'Connect',            
+        action: 'GetOnlineUserCount',            
         param: {
-            id: 'ni',
-            table: 'nh',
         },
     },                                
-    */
 };

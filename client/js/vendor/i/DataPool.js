@@ -31,7 +31,7 @@
             var data = this.pool[i];
 
             if (data.getPK) {
-                console.log('Update', data.className + ' ' + data.getPK());
+                I.l7('Update', data.className + ' ' + data.getPK());
             }
             StoreClass = data.getStore();
             StoreClass.sync(data);
@@ -41,7 +41,7 @@
             var toDelData = this.toDelPool[j];
             StoreClass = toDelData.getStore();
             if (toDelData.getPK) {
-                console.log('Delete', toDelData.className + ' ' + toDelData.getPK());
+                I.l7('Delete', toDelData.className + ' ' + toDelData.getPK());
             }
             StoreClass.sync(toDelData);
             delete this.toDelPool[j];

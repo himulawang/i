@@ -11,7 +11,7 @@
         var req = indexedDB.open(name, version);
 
         req.onupgradeneeded = function(e) {
-            console.log('IndexedDB Upgraded');
+            I.l6('IndexedDB Upgraded');
             var db = e.target.result;
 
             // create PK table
@@ -29,7 +29,7 @@
         }.bind(this);
 
         req.onsuccess = function(e) {
-            console.log('IndexedDB Opened');
+            I.l6('IndexedDB Opened');
             this.db = e.target.result;
 
             // make ModelBaseStore

@@ -2,6 +2,11 @@
     var env = {
         APP: {
             NAME: 'i',
+            // 3: 'ERR', 4: 'WARNING', 5: 'NOTICE', 6: 'INFO', 7: 'DEBUG',
+            LOG_LEVEL: 7,
+        },
+        JADE: {
+            URI: window.location.href + '/tpl/',
         },
         IDB: {
             ENABLED: true,

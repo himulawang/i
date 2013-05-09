@@ -1,6 +1,7 @@
 !function() {
     var ex = {
+        //'30001': 'test',
     };
 
-    // TODO merge to ExceptionCodes
+    I.Util.require('ex', '', ex);
 }();

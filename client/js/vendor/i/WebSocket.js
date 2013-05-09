@@ -1,4 +1,4 @@
-!function () {
+!function() {
     var WS = function WS() {
         this.connection = null;
         this.url = '';
@@ -8,9 +8,10 @@
         this.onclose = function() {};
         this.onmessage = function() {};
 
-        this.start = function start(url, protocol) {
+        this.start = function start(url, protocol, autoReconnectInterval) {
             this.url = url;
             this.protocol = protocol;
+            this.autoReconnectInterval = autoReconnectInterval;
             this.connect();
             return this;
         };
@@ -19,21 +20,22 @@
             this.connection = new WebSocket(this.url, this.protocol);
 
             this.connection.onopen = function() {
-                console.log('Websocket Opened');
+                I.l6('Websocket Opened');
                 this.onopen();
             }.bind(this);
 
             this.connection.onerror = function(error) {
-                console.log('Websocket Error', error);
+                I.l3('Websocket Error', error);
                 this.onerror();
             }.bind(this);
 
             this.connection.onclose = function(error) {
-                console.log('Websocket Closed', error);
+                I.l4('Websocket Closed', error);
                 this.onclose();
-                setTimeout(function() {
-                    this.connect();
-                }.bind(this), 800);
+
+                if (this.autoReconnectInterval !== 0) {
+                    setTimeout(this.connect.bind(this), this.autoReconnectInterval);
+                }
             }.bind(this);
 
             this.connection.onmessage = function(message) {
@@ -41,7 +43,7 @@
                 if (res.r !== 0) throw new I.Exception(res.r);
 
                 var route = I.routes[res.a];
-                console.log('Websocket Incoming: api:', res.a, 'code', res.r, 'data:', res.d);
+                I.l6('WS In api:', res.a, 'code:', res.r, 'data:', res.d);
 
                 I.Ctrl[route.ctrl + 'Controller']['on' + route.action](res.d);
             };
@@ -49,7 +51,7 @@
 
         this.send = function send(api, param) {
             if (this.connection.readyState !== WebSocket.OPEN) {
-                console.log('Websocket Disconnected, cannot send message to server.');
+                I.l4('Websocket Disconnected, cannot send message to server.');
                 return;
             }
             param = param || {};

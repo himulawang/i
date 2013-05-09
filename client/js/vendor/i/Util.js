@@ -213,6 +213,18 @@
             throw new I.Exception(10205);
         },
         /* Loader */
+        define: function define(proto, functions, writable, enumerable, configurable) {
+            writable = writable || false;
+            enumerable = enumerable || false;
+            configurable = configurable || false;
+
+            for (var i in functions) {
+                Object.defineProperty(proto, i, {
+                    value: functions[i],
+                    writable: writable, enumerable: enumerable, configurable: configurable,
+                });
+            }
+        },
         require: function require(name, path, object) {
             var field;
             if (this.isBrowser()) {
@@ -231,14 +243,17 @@
                 field.I[name] = object;
             }
         },
+        _isBrowser: null,
         isBrowser: function() {
+            if (this._isBrowser !== null) return this._isBrowser;
             var field;
             try {
                 field = global;
-                return false;
+                this._isBrowser = false;
             } catch (e) {
-                return true;
+                this._isBrowser = true;
             }
+            return this._isBrowser;
         },
         /* Client */
         isChecked: function isChecked(el) {

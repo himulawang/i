@@ -5,7 +5,7 @@
             data = data || {};
             if (this.cachedTpl[name] === undefined) {
                 var jadeSrc = $.ajax({
-                    url: '../../tpl/' + name + '.jade',
+                    url: I.env.JADE.URI + name + '.jade',
                     async: false,
                 }).responseText;
                 var fn = jade.compile(jadeSrc);
@@ -15,5 +15,6 @@
             return html;
         },
     };
+
     I.Util.require('Renderer', '', Renderer);
 }();

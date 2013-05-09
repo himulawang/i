@@ -158,6 +158,7 @@
     };
 
     Maker.prototype.makeListClass = function makeListClass(orm) {
+        /*
         // class create
         var content = '';
         content += "this.className = '" + orm.list + "';\n";
@@ -170,6 +171,30 @@
         // extends
         Class.prototype = new I.Models.List();
         Class.prototype.constructor = Class;
+        */
+        var Class = function(pk, list) {};
+        Class.prototype = Object.create(I.Models.List.prototype, {
+            constructor: {
+                value: Class,
+                writable: false, enumerable: false, configurable: false,
+            },
+            className: {
+                value: orm.list,
+                writable: false, enumerable: false, configurable: false,
+            },
+            childModelName: {
+                value: orm.name,
+                writable: false, enumerable: false, configurable: false,
+            },
+            getStore: {
+                value: function getStore() { return I.Models[this.className + 'Store']; },
+                writable: false, enumerable: false, configurable: false,
+            },
+            getChildModel: {
+                value: function getChildModel() { return I.Models[this.childModelName]; },
+                writable: false, enumerable: false, configurable: false,
+            },
+        });
 
         this.classes[orm.name + 'ListBase'] = Class;
     };

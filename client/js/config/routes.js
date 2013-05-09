@@ -1,9 +1,9 @@
 !function() {
     var routes = {
         // net
-        C0001: {
+        C0002: {
             ctrl: 'Net',
-            action: 'Connect',
+            action: 'GetOnlineUserCount',
         },
     };
 
