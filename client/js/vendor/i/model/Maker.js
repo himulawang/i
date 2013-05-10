@@ -52,46 +52,44 @@
 
     /* Maker */
     Maker.prototype.makePKClass = function makePKClass(orm) {
-        var content = '';
-        content += "this.className = '" + orm.name + "PK';\n";
-        content += "this.getStore = function getStore() { return I.Models." + orm.name + "PKStore; };";
-
-        var Class = new Function('pk', content);
-
+        var Class = I.Util.createFn(orm.name + 'PKBase', ['pk']);
         Class.prototype = new I.Models.PK();
-        Class.prototype.constructor = Class;
+
+        var functions = {
+            constructor: Class,
+            className: orm.name + 'PK',
+            getStore: function getStore() { return I.Models[orm.name + 'PKStore']; },
+        };
+        I.Util.define(Class.prototype, functions);
 
         this.classes[orm.name + 'PKBase'] = Class;
     };
 
     Maker.prototype.makePKStoreClass = function makePKStoreClass(orm) {
-        var content = '';
-        content += "this.className = '" + orm.name + "PKStore';\n";
-        content += "this.key = '" + I.Const.Frame.GLOBAL_KEY_PREFIX + orm.abb + "';\n";
-        content += "this.getModel = function getModel() { return I.Models." + orm.name + "PK; };\n";
-        content += "this.modelName = '" + orm.name + "';\n";
-
-        var Class = new Function('pk', content);
-
+        var Class = I.Util.createFn(orm.name + 'PKStoreBase');
         Class.prototype = new I.Models['PK' + orm.storeType + 'Store']();
-        Class.prototype.constructor = Class;
 
+        var functions = {
+            constructor: Class,
+            className: orm.name + 'PKStore',
+            key: I.Const.Frame.GLOBAL_KEY_PREFIX + orm.abb,
+            modelName: orm.name,
+            getModel: function getModel() { return I.Models[orm.name + 'PK']; },
+        };
+
+        I.Util.define(Class.prototype, functions);
         this.classes[orm.name + 'PKStoreBase'] = Class;
     };
 
     Maker.prototype.makeModelClass = function makeModelClass(orm) {
         var abbs = this.makeAbbs(orm.column, []);
-
-        // class create
-        var content = '';
-        content += "this.className = '" + orm.name + "';\n";
-        content += "this.pk = '" + orm.pk + "';\n";
-        content += "this.getStore = function getStore() { return I.Models." + orm.name + "Store; };\n";
+        var Class = I.Util.createFn(orm.name + 'Base', ['args']);
+        Class.prototype = new I.Models.Model();
 
         // column
         var columns = [];
-        var abbMap = '';
-        var fullMap = '';
+        var abbMap = {};
+        var fullMap = {};
         orm.column.forEach(function(n, i) {
             columns[i] = {
                 i: i,
@@ -102,23 +100,24 @@
                 toAbb: orm.toAbbFilter.indexOf(i) !== -1,
                 toArray: orm.toArrayFilter.indexOf(i) !== -1,
             };
-            abbMap += abbs[n] + ": this.column[" + i + "],\n";
-            fullMap += n + ": this.column[" + i + "],\n";
+            abbMap[abbs[n]] = columns[i];
+            fullMap[n] = columns[i];
         });
-        content += "this.column = " + JSON.stringify(columns) + ";\n";
-        content += "this.abbMap = {\n";
-        content += abbMap;
-        content += "};\n";
-        content += "this.fullMap = {\n";
-        content += fullMap;
-        content += "};\n";
 
-        var Class = new Function('args', content);
+        var functions = {
+            constructor: Class,
+            className: orm.name,
+            pk: orm.pk,
+            getStore: function getStore() {
+                return I.Models[orm.name + 'Store'];
+            },
+            column: columns,
+            abbMap: abbMap,
+            fullMap: fullMap,
+        };
 
-        // extends
-        Class.prototype = new I.Models.Model();
-        Class.prototype.constructor = Class;
-
+        I.Util.define(Class.prototype, functions);
+        
         // getter & setter
         orm.column.forEach(function(v, i) {
             Object.defineProperty(
@@ -139,87 +138,57 @@
     };
 
     Maker.prototype.makeModelStoreClass = function makeModelStoreClass(orm) {
-        // class create
-        var content = '';
-        content += "this.className = '" + orm.name + "Store';\n";
-        content += "this.getModel = function getModel() { return I.Models." + orm.name + "; };\n";
-        content += "this.modelName = '" + orm.name + "';\n";
-        content += "this.pk = '" + orm.pk + "';\n";
-        content += "this.abb = '" + orm.abb + "';\n";
-        content += "this.pkAutoIncrement = " + orm.pkAutoIncrement.toString() + ";\n";
-
-        var Class = new Function(content);
-
-        // extends
+        var Class = I.Util.createFn(orm.name + 'StoreBase');
         Class.prototype = new I.Models['Model' + orm.storeType + 'Store']();
-        Class.prototype.constructor = Class;
 
+        var functions = {
+            constructor: Class,
+            className: orm.name + 'Store',
+            modelName: orm.name,
+            pk: orm.pk,
+            abb: orm.abb,
+            pkAutoIncrement: orm.pkAutoIncrement,
+            getModel: function getModel() { return I.Models[orm.name]; },
+        };
+
+        I.Util.define(Class.prototype, functions);
         this.classes[orm.name + 'StoreBase'] = Class;
     };
 
     Maker.prototype.makeListClass = function makeListClass(orm) {
-        /*
-        // class create
-        var content = '';
-        content += "this.className = '" + orm.list + "';\n";
-        content += "this.getStore = function getStore() { return I.Models." + orm.list + "Store; };\n";
-        content += "this.getChildModel = function getChildModel() { return I.Models." + orm.name + "; };\n";
-        content += "this.childModelName = '" + orm.name + "';\n";
-
-        var Class = new Function('pk', 'list', content);
-
-        // extends
+        var className = orm.name + 'ListBase';
+        var Class = I.Util.createFn(className, ['pk', 'list']);
         Class.prototype = new I.Models.List();
-        Class.prototype.constructor = Class;
-        */
-        var Class = function(pk, list) {};
-        Class.prototype = Object.create(I.Models.List.prototype, {
-            constructor: {
-                value: Class,
-                writable: false, enumerable: false, configurable: false,
-            },
-            className: {
-                value: orm.list,
-                writable: false, enumerable: false, configurable: false,
-            },
-            childModelName: {
-                value: orm.name,
-                writable: false, enumerable: false, configurable: false,
-            },
-            getStore: {
-                value: function getStore() { return I.Models[this.className + 'Store']; },
-                writable: false, enumerable: false, configurable: false,
-            },
-            getChildModel: {
-                value: function getChildModel() { return I.Models[this.childModelName]; },
-                writable: false, enumerable: false, configurable: false,
-            },
-        });
+        var functions = {
+            constructor: Class,
+            className: orm.list,
+            childModelName: orm.name,
+            getStore: function getStore() { return I.Models[this.className + 'Store']; },
+            getChildModel: function getChildModel() { return I.Models[this.childModelName]; },
+        };
 
-        this.classes[orm.name + 'ListBase'] = Class;
+        I.Util.define(Class.prototype, functions);
+
+        this.classes[className] = Class;
     };
 
     Maker.prototype.makeListStoreClass = function makeListStoreClass(orm) {
-        // class create
-        var content = '';
-        content += "this.className = '" + orm.list + "List';\n";
-        content += "this.abb = '" + orm.abb + "l';\n";
-
-        content += "this.getListModel = function getListModel() { return I.Models." + orm.list + "; };\n";
-        content += "this.listModelName = '" + orm.list + "';\n";
-
-        content += "this.getChildModel = function getChildModel() { return I.Models." + orm.name + "; };\n";
-        content += "this.childModelName = '" + orm.name + "';\n";
-
-        content += "this.getChildStore = function getChildStore() { return I.Models." + orm.name + "Store; };\n";
-        content += "this.childStoreName = '" + orm.name + "Store';\n";
-
-        var Class = new Function(content);
-
-        // extends
+        var Class = I.Util.createFn(orm.list + 'StoreBase');
         Class.prototype = new I.Models['List' + orm.storeType + 'Store']();
-        Class.prototype.constructor = Class;
 
+        var functions = {
+            constructor: Class,
+            className: orm.list + 'Store',
+            abb: orm.abb + 'l',
+            childModelName: orm.name,
+            listModelName: orm.list,
+            childStoreName: orm.name + 'Store',
+            getChildModel: function getChildModel() { return I.Models[orm.name]; },
+            getListModel: function getListModel() { return I.Models[orm.list]; },
+            getChildStore: function getChildStore() { return I.Models[orm.name + 'Store']; },
+        };
+
+        I.Util.define(Class.prototype, functions);
         this.classes[orm.list + 'StoreBase'] = Class;
     };
 
@@ -455,7 +424,7 @@
     Maker.prototype.createClientPKStoreFile = function createClientPKStoreFile(orm, dir) {
         var pkStoreName = orm.name + 'PKStore';
         var content = "/* This file is generated by IFramework - Maker.js for user to rewrite PKStore file */\n";
-        content += "I.Maker.indexedDBCallbacks.push(function (db) {\n";
+        content += "I.Loader." + orm.storeType + "Queue.push(function (db) {\n";
         content += "    var " + pkStoreName + " = function " + pkStoreName + "(db) {\n";
         content += "        this.db = db;\n";
         content += "    };\n";
@@ -496,7 +465,7 @@
     Maker.prototype.createClientModelStoreFile = function createClientModelStoreFile(orm, dir) {
         var storeName = orm.name + 'Store';
         var content = "/* This file is generated by IFramework - Maker.js for user to rewrite ModelStore file */\n";
-        content += "I.Maker.indexedDBCallbacks.push(function (db) {\n";
+        content += "I.Loader." + orm.storeType + "Queue.push(function (db) {\n";
         content += "    var " + storeName + " = function " + storeName + "(db) {\n";
         content += "        this.db = db;\n";
         content += "    };\n";
@@ -537,7 +506,7 @@
     Maker.prototype.createClientListStoreFile = function createClientListStoreFile(orm, dir) {
         var listStoreName = orm.list + 'Store';
         var content = "/* This file is generated by IFramework - Maker.js for user to rewrite ListStore file */\n";
-        content += "I.Maker.indexedDBCallbacks.push(function (db) {\n";
+        content += "I.Loader." + orm.storeType + "Queue.push(function (db) {\n";
         content += "    var " + listStoreName + " = function " + listStoreName + "(db) {\n";
         content += "        this.db = db;\n";
         content += "    };\n";

@@ -1,14 +1,12 @@
 !function() {
-    var PKIndexedDBStore = function() {
-        this.db = null;
-    };
+    var PKIndexedDBStore = function() {};
 
     PKIndexedDBStore.prototype.init = function init(db) {
         this.db = db;
     };
 
     PKIndexedDBStore.prototype.get = function get(cb) {
-        this.db.get(I.Const.Frame.INDEXED_DB_PK_TABLE, this.modelName + 'PK', function(obj) {
+        this.db.get(I.Const.IDB.PK_TABLE, this.modelName + 'PK', function(obj) {
             var pkClass = this.getModel();
 
             if (obj === undefined) {
@@ -24,7 +22,7 @@
         cb = cb || function() {};
         if (pk instanceof this.getModel() === false) throw new I.Exception(20001);
         if (pk.updated === false) return cb();
-        this.db.set(I.Const.Frame.INDEXED_DB_PK_TABLE, { name: pk.className, pk: pk.get() }, function() {
+        this.db.set(I.Const.IDB.PK_TABLE, { name: pk.className, pk: pk.get() }, function() {
             pk.updated = false;
             cb();
         });
@@ -33,7 +31,7 @@
     PKIndexedDBStore.prototype.unset = function unset(pk, cb) {
         cb = cb || function() {};
         if (pk instanceof this.getModel() === false) throw new I.Exception(20002);
-        this.db.del(I.Const.Frame.INDEXED_DB_PK_TABLE, this.modelName + 'PK', cb);
+        this.db.del(I.Const.IDB.PK_TABLE, this.modelName + 'PK', cb);
     };
 
     I.Util.require('PKIndexedDBStore', 'Models', PKIndexedDBStore);

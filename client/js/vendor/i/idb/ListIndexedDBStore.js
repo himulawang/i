@@ -1,7 +1,5 @@
 !function() {
-    var ListIndexedDBStore = function() {
-        this.db = null;
-    };
+    var ListIndexedDBStore = function() {};
 
     ListIndexedDBStore.prototype.init = function init(db) {
         this.db = db;
@@ -94,4 +92,3 @@
 
     I.Util.require('ListIndexedDBStore', 'Models', ListIndexedDBStore);
 }();
-

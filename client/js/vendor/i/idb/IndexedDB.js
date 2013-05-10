@@ -1,10 +1,10 @@
 !function() {
-    var IndexedDB = function(name, version, orms) {
+    var IndexedDB = function(name, version) {
         this.db = null;
         this.name = name;
         this.version = version;
 
-        this.onsuccess = function() {};
+        this.successEvents = [];
         this.onerror = function() {};
         this.onupgradeneeded = function() {};
 
@@ -32,25 +32,18 @@
             I.l6('IndexedDB Opened');
             this.db = e.target.result;
 
-            // make ModelBaseStore
-            I.Maker.classes = {};
-            orms.forEach(function(orm) {
-                I.Maker.makePKStoreClass(orm);
-                I.Maker.makeModelStoreClass(orm);
-                I.Maker.makeListStoreClass(orm);
-            }.bind(this));
-
-            for (var i in I.Maker.classes) {
-                I.Models[i] = I.Maker.classes[i];
-            }
-
-            // make ModelStore
-            for (var i in I.Maker.indexedDBCallbacks) {
-                I.Maker.indexedDBCallbacks[i](this);
-            }
-
             this.onsuccess();
         }.bind(this);
+    };
+
+    IndexedDB.prototype.regSuccessEvent = function regSuccessEvent(fn) {
+        this.successEvents.push(fn);
+    };
+
+    IndexedDB.prototype.onsuccess = function onsuccess() {
+        for (var i = 0; i < this.successEvents.length; ++i) {
+            this.successEvents[i]();
+        }
     };
 
     IndexedDB.prototype.get = function get(table, key, cb) {
@@ -69,7 +62,7 @@
         trans.onerror = this.onerror;
 
         var store = trans.objectStore(table);
-        var index = store.index(I.Const.Frame.INDEXED_DB_LIST_COLUMN_NAME);
+        var index = store.index(I.Const.IDB.LIST_COLUMN_NAME);
 
         var results = [];
         var cursorReq = index.openCursor(listId);
@@ -114,7 +107,7 @@
         trans.onerror = this.onerror;
 
         var store = trans.objectStore(table);
-        var index = store.index(I.Const.Frame.INDEXED_DB_LIST_COLUMN_NAME);
+        var index = store.index(I.Const.IDB.LIST_COLUMN_NAME);
 
         var cursorReq = index.openCursor(listId);
         cursorReq.onsuccess = function(e) {

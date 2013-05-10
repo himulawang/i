@@ -5,8 +5,27 @@
             if (!env.ENABLED) return;
             cb = cb || function() {};
 
-            var idb = new I.Models.IndexedDB(env.NAME, env.VERSION, I.orms);
-            idb.onsuccess = cb;
+            var idb = new I.Models.IndexedDB(env.NAME, env.VERSION);
+            idb.regSuccessEvent(function() {
+                // make ModelBaseStore
+                I.Maker.classes = {};
+                I.orms.forEach(function(orm) {
+                    I.Maker.makePKStoreClass(orm);
+                    I.Maker.makeModelStoreClass(orm);
+                    I.Maker.makeListStoreClass(orm);
+                });
+
+                for (var i in I.Maker.classes) {
+                    I.Models[i] = I.Maker.classes[i];
+                }
+
+                // make ModelStore
+                this.IndexedDBQueue.forEach(function(fn) {
+                    fn(idb);
+                });
+            }.bind(this));
+            idb.regSuccessEvent(cb);
+
             I.idb = idb;
         },
         initWebsocket: function initWebSocket(cb) {
@@ -26,6 +45,7 @@
             Loader.initWebsocket(wsCallback);
             Loader.initIndexedDB(idbCallback);
         },
+        IndexedDBQueue: [],
     };
 
     Loader.mergeExceptionCodes();

@@ -1,7 +1,5 @@
 !function() {
-    var ModelIndexedDBStore = function() {
-        this.db = null;
-    };
+    var ModelIndexedDBStore = function() {};
 
     ModelIndexedDBStore.prototype.init = function init(db) {
         this.db = db;

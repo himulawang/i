@@ -213,6 +213,13 @@
             throw new I.Exception(10205);
         },
         /* Loader */
+        createFn: function createFn(name, param) {
+            var paramString = '';
+            if (Array.isArray(param) && param.length > 0) paramString = param.join(', ');
+
+            var fn = new Function('return function ' + name + ' (' + paramString + ') {};');
+            return fn();
+        },
         define: function define(proto, functions, writable, enumerable, configurable) {
             writable = writable || false;
             enumerable = enumerable || false;
