@@ -6,7 +6,9 @@
             cb = cb || function() {};
 
             var idb = new I.Models.IndexedDB(env.NAME, env.VERSION);
-            idb.regSuccessEvent(function() {
+
+            // on success
+            idb.regSuccessEvent(function(db) {
                 // make ModelBaseStore
                 I.Maker.classes = {};
                 I.orms.forEach(function(orm) {
@@ -24,7 +26,20 @@
                     fn(idb);
                 });
             }.bind(this));
+
             idb.regSuccessEvent(cb);
+
+            // on upgradeNeeded
+            idb.regUpgradeEvent(function(db) {
+                // create PK table
+                idb.resetTable(db, I.Const.IDB.PK_TABLE, 'name');
+
+                // create orm tables
+                I.orms.forEach(function(orm) {
+                    if (orm.storeType !== 'IndexedDB') return;
+                    idb.resetTable(db, orm.name, orm.pk, I.Const.IDB.LIST_COLUMN_NAME, false);
+                });
+            });
 
             I.idb = idb;
         },

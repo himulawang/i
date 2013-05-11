@@ -26,7 +26,7 @@
         if (list instanceof this.getListModel() === false) throw new I.Exception(20005);
         cb = cb || function() {};
 
-        var listColumnName = I.Const.Frame.INDEXED_DB_LIST_COLUMN_NAME;
+        var listColumnName = I.Const.IDB.LIST_COLUMN_NAME;
         var results = {
             toDel: list.toDelList.length,
             toUpdate: list.toUpdateList.length,
@@ -62,7 +62,7 @@
 
             this.db.set(this.childModelName, obj, function() {
                 results.updateDone = results.updateDone + 1;
-                child.resetUpdateList();
+                child.reset();
                 allDone();
             });
         }.bind(this));
@@ -76,7 +76,7 @@
             this.db.set(this.childModelName, obj, function() {
                 results.addDone = results.addDone + 1;
                 allDone();
-                child.resetUpdateList();
+                child.reset();
                 list.set(child);
             });
         }.bind(this));

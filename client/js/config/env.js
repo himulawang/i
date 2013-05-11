@@ -12,7 +12,6 @@
             ENABLED: true,
             NAME: 'i',
             VERSION: 4,
-
         },
         WS: {
             ENABLED: true,

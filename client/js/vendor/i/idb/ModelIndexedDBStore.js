@@ -23,7 +23,7 @@
         cb = cb || function() {};
 
         this.db.set(this.modelName, model.toArray(), function() {
-            model.resetUpdateList();
+            model.reset();
             cb();
         });
     };

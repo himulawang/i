@@ -3,6 +3,7 @@ $(function() {
         $('#Status').html('<span class="label label-success">Online </span>');
         I.Ctrl.NetController.GetOnlineUserCount();
     }, function() {
+        start();
     });
 
     I.ws.onclose = function() {
@@ -14,15 +15,21 @@ $(function() {
     window.indexView = new I.View.IndexView();
     indexView.render();
 
-var c1 = new I.Models.Connection();
-c1.setPK(1);
-var c2 = new I.Models.Connection();
-c2.setPK(2);
-
-window.cl = new I.Models.ConnectionList(1, {1: c1, 2: c2});
-console.dir(cl);
-
-window.pk = new I.Models.ConnectionPK(1);
-console.dir(pk);
 
 });
+
+function start() {
+    var c1 = new I.Models.Connection();
+    c1.setPK(1);
+    var c2 = new I.Models.Connection();
+    c2.setPK(2);
+
+    window.cl = new I.Models.ConnectionList(1);
+    cl.add(c1);
+    cl.add(c2);
+
+
+    I.Models.ConnectionListStore.update(cl, function() {
+        I.l7('set list done');
+    });
+};

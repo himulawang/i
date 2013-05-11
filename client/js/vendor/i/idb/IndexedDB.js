@@ -5,24 +5,14 @@
         this.version = version;
 
         this.successEvents = [];
+        this.upgradeEvents = [];
         this.onerror = function() {};
-        this.onupgradeneeded = function() {};
 
         var req = indexedDB.open(name, version);
 
         req.onupgradeneeded = function(e) {
             I.l6('IndexedDB Upgraded');
             var db = e.target.result;
-
-            // create PK table
-            this.resetTable(db, I.Const.IDB.PK_TABLE, 'name');
-
-            // create orm tables
-            orms.forEach(function(orm) {
-                if (orm.storeType !== 'IndexedDB') return;
-                this.resetTable(db, orm.name, orm.pk, I.Const.IDB.LIST_COLUMN_NAME, false);
-            }.bind(this));
-
             e.target.transaction.onerror = this.onerror;
 
             this.onupgradeneeded(db);
@@ -32,18 +22,23 @@
             I.l6('IndexedDB Opened');
             this.db = e.target.result;
 
-            this.onsuccess();
+            this.onsuccess(this.db);
         }.bind(this);
     };
 
     IndexedDB.prototype.regSuccessEvent = function regSuccessEvent(fn) {
         this.successEvents.push(fn);
     };
+    IndexedDB.prototype.regUpgradeEvent = function regUpgradeEvent(fn) {
+        this.upgradeEvents.push(fn);
+    };
 
-    IndexedDB.prototype.onsuccess = function onsuccess() {
-        for (var i = 0; i < this.successEvents.length; ++i) {
-            this.successEvents[i]();
-        }
+    IndexedDB.prototype.onsuccess = function onsuccess(db) {
+        for (var i = 0; i < this.successEvents.length; ++i) this.successEvents[i](db);
+    };
+
+    IndexedDB.prototype.onupgradeneeded = function onupgradeneeded(db) {
+        for (var i = 0; i < this.upgradeEvents.length; ++i) this.upgradeEvents[i](db);
     };
 
     IndexedDB.prototype.get = function get(table, key, cb) {
