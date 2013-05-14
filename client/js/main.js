@@ -14,8 +14,6 @@ $(function() {
     /* view */
     window.indexView = new I.View.IndexView();
     indexView.render();
-
-
 });
 
 function start() {
@@ -31,5 +29,18 @@ function start() {
 
     I.Models.ConnectionListStore.update(cl, function() {
         I.l7('set list done');
+    });
+
+    var pk = new I.Models.ConnectionPK();
+    pk.set(10);
+    I.Models.ConnectionPKStore.set(pk).then(function() {
+        return I.Models.ConnectionPKStore.get();
+    })
+    .then(function(pk) {
+        console.dir(pk);
+    });
+
+    I.Models.ConnectionStore.get(1).then(function(model) {
+        console.dir(model);
     });
 };

@@ -6,7 +6,7 @@
             LOG_LEVEL: 7,
         },
         JADE: {
-            URI: window.location.href + '/tpl/',
+            URI: '../../tpl/',
         },
         IDB: {
             ENABLED: true,
@@ -17,7 +17,7 @@
             ENABLED: true,
             URL: 'ws://' + window.location.host + '/',
             PROTOCOL: 'i',
-            AUTO_RECONNECT_INTERVAL: 800,
+            AUTO_RECONNECT_INTERVAL: 800, // 0 is off
         },
     };
 
