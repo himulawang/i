@@ -5,7 +5,9 @@ I.Loader.ModelQueue.push(function () {
     };
 
     ConnectionList.prototype = new I.Models.ConnectionListBase();
-    ConnectionList.prototype.constructor = ConnectionList;
-
+    var functions = {
+        constructor: ConnectionList,
+    }
+    I.Util.define(ConnectionList.prototype, functions);
     I.Util.require('ConnectionList', 'Models', ConnectionList);
 });

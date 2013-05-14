@@ -253,6 +253,16 @@
         isBrowser: function() {
             return typeof window === 'object';
         },
+        /* Assert */
+        deepAssert: function deepAssert(a, b) {
+            if (typeof a !== 'object' || typeof b !== 'object') throw new I.Exception(10252);
+            if (I.Util.getLength(a) !== I.Util.getLength(b)) return false;
+
+            for (var i in a) {
+                if (a[i] !== b[i]) return false;
+            }
+            return true;
+        },
         /* Client */
         isChecked: function isChecked(el) {
             return $(el).attr('checked') ? 1 : 0;

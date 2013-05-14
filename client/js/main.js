@@ -14,33 +14,11 @@ $(function() {
     /* view */
     window.indexView = new I.View.IndexView();
     indexView.render();
+    window.testResultView = new I.View.TestResultView();
 });
 
 function start() {
-    var c1 = new I.Models.Connection();
-    c1.setPK(1);
-    var c2 = new I.Models.Connection();
-    c2.setPK(2);
-
-    window.cl = new I.Models.ConnectionList(1);
-    cl.add(c1);
-    cl.add(c2);
-
-
-    I.Models.ConnectionListStore.update(cl, function() {
-        I.l7('set list done');
-    });
-
-    var pk = new I.Models.ConnectionPK();
-    pk.set(10);
-    I.Models.ConnectionPKStore.set(pk).then(function() {
-        return I.Models.ConnectionPKStore.get();
-    })
-    .then(function(pk) {
-        console.dir(pk);
-    });
-
-    I.Models.ConnectionStore.get(1).then(function(model) {
-        console.dir(model);
-    });
+    I.Ctrl.PKTestController.run();
+    I.Ctrl.ModelTestController.run();
+    I.Ctrl.ListTestController.run();
 };

@@ -5,7 +5,9 @@ I.Loader.IndexedDBQueue.push(function (db) {
     };
 
     ConnectionListStore.prototype = new I.Models.ConnectionListStoreBase();
-    ConnectionListStore.prototype.constructor = ConnectionListStore;
-
+    var functions = {
+        constructor: ConnectionListStore,
+    }
+    I.Util.define(ConnectionListStore.prototype, functions);
     I.Util.require('ConnectionListStore', 'Models', new ConnectionListStore(db));
 });

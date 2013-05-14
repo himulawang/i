@@ -5,7 +5,9 @@ I.Loader.IndexedDBQueue.push(function (db) {
     };
 
     ConnectionPKStore.prototype = new I.Models.ConnectionPKStoreBase();
-    ConnectionPKStore.prototype.constructor = ConnectionPKStore;
-
+    var functions = {
+        constructor: ConnectionPKStore,
+    }
+    I.Util.define(ConnectionPKStore.prototype, functions);
     I.Util.require('ConnectionPKStore', 'Models', new ConnectionPKStore(db));
 });

@@ -66,6 +66,7 @@
 
         // util time
         10251: 'Invalid time to convert to timestamp.',
+        10252: 'Invalid object when deepAssert.',
 
         // controller
         10301: 'Invalid request.',

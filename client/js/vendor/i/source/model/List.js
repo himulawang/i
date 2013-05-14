@@ -135,7 +135,7 @@
             } else { // child not in db, delete direct in memory
                 this.toAddSyncList.splice(pos, 1);
             }
-            this.unset(index);
+            delete this[index];
         },
         dropSync: function dropSync() {
             for (var i in this) {
@@ -190,21 +190,21 @@
             }
             return toArray;
         },
-        fromAbbArray: function fromAbbArray(dataList, resetUpdateList) {
+        fromAbbArray: function fromAbbArray(dataList, reset) {
             var child;
             var childModelClass = this.getChildModel();
             for (var i in dataList) {
                 child = new childModelClass();
-                child.fromAbbArray(dataList[i], resetUpdateList);
+                child.fromAbbArray(dataList[i], reset);
                 this.set(child);
             }
         },
-        fromArray: function fromArray(dataList, resetUpdateList) {
+        fromArray: function fromArray(dataList, reset) {
             var child;
             var childModelClass = this.getChildModel();
             for (var i in dataList) {
                 child = new childModelClass();
-                child.fromArray(dataList[i], resetUpdateList);
+                child.fromArray(dataList[i], reset);
                 this.set(child);
             }
         },

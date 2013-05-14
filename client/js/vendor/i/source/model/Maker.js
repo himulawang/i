@@ -405,8 +405,10 @@
 
         // extends
         content += "    " + pkName + ".prototype = new I.Models." + pkName + "Base();\n";
-        content += "    " + pkName + ".prototype.constructor = " + pkName + ";\n";
-        content += "\n";
+        content += "    var functions = {\n";
+        content += "        constructor: " + pkName + ",\n";
+        content += "    }\n";
+        content += "    I.Util.define(" + pkName + ".prototype, functions);\n";
 
         // exports
         content += "    I.Util.require('" + pkName + "', 'Models', " + pkName + ");\n";
@@ -426,8 +428,10 @@
 
         // extends
         content += "    " + pkStoreName + ".prototype = new I.Models." + pkStoreName + "Base();\n";
-        content += "    " + pkStoreName + ".prototype.constructor = " + pkStoreName + ";\n";
-        content += "\n";
+        content += "    var functions = {\n";
+        content += "        constructor: " + pkStoreName + ",\n";
+        content += "    }\n";
+        content += "    I.Util.define(" + pkStoreName + ".prototype, functions);\n";
 
         // exports
         content += "    I.Util.require('" + pkStoreName + "', 'Models', new " + pkStoreName + "(db));\n";
@@ -446,8 +450,10 @@
 
         // extends
         content += "    " + orm.name + ".prototype = new I.Models." + orm.name + "Base();\n";
-        content += "    " + orm.name + ".prototype.constructor = " + orm.name + ";\n";
-        content += "\n";
+        content += "    var functions = {\n";
+        content += "        constructor: " + orm.name + ",\n";
+        content += "    }\n";
+        content += "    I.Util.define(" + orm.name + ".prototype, functions);\n";
 
         // exports
         content += "    I.Util.require('" + orm.name + "', 'Models', " + orm.name + ");\n";
@@ -467,8 +473,10 @@
 
         // extends
         content += "    " + storeName + ".prototype = new I.Models." + storeName + "Base();\n";
-        content += "    " + storeName + ".prototype.constructor = " + storeName + ";\n";
-        content += "\n";
+        content += "    var functions = {\n";
+        content += "        constructor: " + storeName + ",\n";
+        content += "    }\n";
+        content += "    I.Util.define(" + storeName + ".prototype, functions);\n";
 
         // exports
         content += "    I.Util.require('" + storeName + "', 'Models', new " + storeName + "(db));\n";
@@ -487,8 +495,10 @@
 
         // extends
         content += "    " + orm.list + ".prototype = new I.Models." + orm.list + "Base();\n";
-        content += "    " + orm.list + ".prototype.constructor = " + orm.list + ";\n";
-        content += "\n";
+        content += "    var functions = {\n";
+        content += "        constructor: " + orm.list + ",\n";
+        content += "    }\n";
+        content += "    I.Util.define(" + orm.list + ".prototype, functions);\n";
 
         // exports
         content += "    I.Util.require('" + orm.list + "', 'Models', " + orm.list + ");\n";
@@ -508,8 +518,10 @@
 
         // extends
         content += "    " + listStoreName + ".prototype = new I.Models." + listStoreName + "Base();\n";
-        content += "    " + listStoreName + ".prototype.constructor = " + listStoreName + ";\n";
-        content += "\n";
+        content += "    var functions = {\n";
+        content += "        constructor: " + listStoreName + ",\n";
+        content += "    }\n";
+        content += "    I.Util.define(" + listStoreName + ".prototype, functions);\n";
 
         // exports
         content += "    I.Util.require('" + listStoreName + "', 'Models', new " + listStoreName + "(db));\n";

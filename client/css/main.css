@@ -33,3 +33,10 @@
     border: 1px solid #DDD;
     border-radius: 6px;
 }
+
+.test-success {
+    background-color: #468847;
+}
+.test-fail {
+    background-color: #b94a48;
+}
