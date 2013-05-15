@@ -70,7 +70,9 @@
         // Async API
         add: function add(child) {
             if (child instanceof this.getChildModel() === false) throw new I.Exception(10127);
-            var childExists = this.get(child.getPK());
+            var pk = child.getPK();
+            if (!I.Util.isUInt(pk)) throw new I.Exception(10143);
+            var childExists = this.get(pk);
             if (childExists) throw new I.Exception(10140);
             this.toAddList.push(child);
         },
@@ -80,6 +82,7 @@
                 index = input;
             } else if (input instanceof this.getChildModel()) {
                 index = input.getPK();
+                if (!I.Util.isUInt(index)) throw new I.Exception(10144);
             } else {
                 throw new I.Exception(10128);
             }
@@ -90,12 +93,12 @@
         drop: function drop() {
             for (var i in this) {
                 this.toDelList.push(this[i]);
-                delete this[i];
             }
         },
         update: function update(child) {
             if (child instanceof this.getChildModel() === false) throw new I.Exception(10130);
             var index = child.getPK();
+            if (!I.Util.isUInt(index)) throw new I.Exception(10145);
             var preChild = this.get(index);
             if (preChild === null) throw new I.Exception(10131);
 
@@ -106,7 +109,7 @@
             if (child instanceof this.getChildModel() === false) throw new I.Exception(10135);
             // the child of addSync must contain pk
             var pk = child.getPK();
-            if (pk === undefined) throw new I.Exception(10120);
+            if (!I.Util.isUInt(pk)) throw new I.Exception(10120);
 
             // child can't exists in list
             var childExists = this.get(pk);
@@ -121,6 +124,7 @@
                 index = input;
             } else if (input instanceof this.getChildModel()) {
                 index = input.getPK();
+                if (!I.Util.isUInt(index)) throw new I.Exception(10146);
             } else {
                 throw new I.Exception(10136);
             }
@@ -153,6 +157,7 @@
         updateSync: function updateSync(child) {
             if (child instanceof this.getChildModel() === false) throw new I.Exception(10138);
             var index = child.getPK();
+            if (!I.Util.isUInt(index)) throw new I.Exception(10147);
 
             if (this.get(index) === null) throw new I.Exception(10139);
 

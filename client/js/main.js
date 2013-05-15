@@ -21,4 +21,8 @@ function start() {
     I.Ctrl.PKTestController.run();
     I.Ctrl.ModelTestController.run();
     I.Ctrl.ListTestController.run();
+    I.Ctrl.PKIndexedDBStoreTestController.run()
+    .then(function() {
+        I.Ctrl.ModelIndexedDBStoreTestController.run();
+    });
 };

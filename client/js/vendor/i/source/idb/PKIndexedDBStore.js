@@ -28,6 +28,7 @@
         var deferred = Q.defer();
         if (pk.updated === false) {
             cb();
+            deferred.resolve();
             return deferred.promise;
         }
         this.db.set(I.Const.IDB.PK_TABLE, { name: pk.className, pk: pk.get() }, function() {

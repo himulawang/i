@@ -50,6 +50,11 @@
         10140: 'Child exists when add to list.',
         10141: 'Child exists when addSync to list.',
         10142: 'Invalid list model when updateSync list to db.',
+        10143: 'Child has no pk when add it to list.',
+        10144: 'Child has no pk when del it from list.',
+        10145: 'Child has no pk when update it to list.',
+        10146: 'Child has no pk when delSync it from list.',
+        10147: 'Child has no pk when updateSync it to list.',
 
         // util
         10201: 'Invalid object when get length.',
