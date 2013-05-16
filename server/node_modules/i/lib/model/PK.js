@@ -7,6 +7,7 @@
                 updated: false,
                 tagDelSync: false,
                 pk: 0,
+                fromStore: false,
             };
 
             I.Util.define(this, attrs, true);

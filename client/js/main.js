@@ -23,6 +23,9 @@ function start() {
     I.Ctrl.ListTestController.run();
     I.Ctrl.PKIndexedDBStoreTestController.run()
     .then(function() {
-        I.Ctrl.ModelIndexedDBStoreTestController.run();
+        return I.Ctrl.ModelIndexedDBStoreTestController.run();
+    })
+    .then(function() {
+        return I.Ctrl.ListIndexedDBStoreTestController.run();
     });
 };

@@ -1,5 +1,9 @@
 exports.env = {
-    HTTP_PORT: '8081',
-    REDIS_HOST: '127.0.0.1',
-    REDIS_PORT: '6379',
+    WEB: {
+        PORT: '8081',
+    },
+    RDB: {
+        HOST: '127.0.0.1',
+        PORT: '6379',
+    },
 };

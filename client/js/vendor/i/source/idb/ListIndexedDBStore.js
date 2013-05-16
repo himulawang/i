@@ -13,12 +13,15 @@
             var modelClass = this.getChildModel();
             var list = new listClass(id);
 
-            data.forEach(function(n) {
-                var child = new modelClass();
-                child.fromArray(n, true);
+            if (data.length !== 0) {
+                data.forEach(function(n) {
+                    var child = new modelClass();
+                    child.fromArray(n, true);
 
-                list.set(child);
-            });
+                    list.set(child);
+                });
+                list.fromStore = true;
+            }
 
             cb(list);
             deferred.resolve(list);
@@ -33,6 +36,15 @@
         var deferred = Q.defer();
 
         var listColumnName = I.Const.IDB.LIST_COLUMN_NAME;
+        if (list.toDelList.length === 0 &&
+            list.toUpdateList.length === 0 &&
+            list.toAddList.length === 0
+        ) {
+            cb(list);
+            deferred.resolve(list);
+            return deferred.promise;
+        }
+
         var results = {
             toDel: list.toDelList.length,
             toUpdate: list.toUpdateList.length,
@@ -84,9 +96,9 @@
 
             this.db.set(this.childModelName, obj, function() {
                 results.addDone = results.addDone + 1;
-                allDone();
                 child.reset();
                 list.set(child);
+                allDone();
             });
         }.bind(this));
         list.toAddList = [];
@@ -116,17 +128,17 @@
             list.toUpdateSyncList.length === 0 &&
             list.toAddSyncList.length === 0
         ) {
-            deferred.resolve(list);
             cb(list);
+            deferred.resolve(list);
             return deferred.promise;
         }
 
         var util = I.Util;
         var listColumnName = I.Const.IDB.LIST_COLUMN_NAME;
         var results = {
-            toDel: list.toDelList.length,
-            toUpdate: list.toUpdateList.length,
-            toAdd: list.toAddList.length,
+            toDel: list.toDelSyncList.length,
+            toUpdate: list.toUpdateSyncList.length,
+            toAdd: list.toAddSyncList.length,
             delDone: 0,
             updateDone: 0,
             addDone: 0,
@@ -176,9 +188,9 @@
 
             this.db.set(this.childModelName, obj, function() {
                 results.addDone = results.addDone + 1;
-                allDone();
                 child.reset();
                 list.set(child);
+                allDone();
             });
         }.bind(this));
         list.toAddSyncList = [];

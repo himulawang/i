@@ -15,6 +15,7 @@
                 var pk = new pkClass();
             } else {
                 var pk = new pkClass(obj.pk);
+                pk.fromStore = true;
             }
             cb(pk);
             deferred.resolve(pk);

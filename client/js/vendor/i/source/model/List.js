@@ -15,6 +15,7 @@
                 toDelSyncList: [],
                 toUpdateSyncList: [],
                 tagDelSync: false,
+                fromStore: false,
             };
             I.Util.define(this, attrs, true);
 

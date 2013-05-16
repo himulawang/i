@@ -6,10 +6,7 @@
             .then(this.get)
             .then(this.unset)
             .then(this.sync)
-            //.then(deferred.resolve);
-            .then(function() {
-                deferred.resolve();
-            });
+            .then(deferred.resolve);
             return deferred.promise;
         },
         set: function set() {

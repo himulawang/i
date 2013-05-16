@@ -8,6 +8,7 @@
                 updateList: [],
                 tagAddSync: false,
                 tagDelSync: false,
+                fromStore: false,
             };
 
             I.Util.define(this, attrs, true);
@@ -36,6 +37,13 @@
         },
         clone: function clone() { 
             return new this.constructor(this.args); 
+        },
+        isUpdated: function isUpdated() {
+            var length = this.updateList.length;
+            for (var i = 0; i < length; ++i) {
+                if (this.updateList[i]) return true;
+            }
+            return false;
         },
         toAdd: function toAdd(filterOn) { 
             var toAdd = [];

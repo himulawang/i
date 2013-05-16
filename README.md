@@ -1314,7 +1314,7 @@ C0001: {
   * e: Empty参数允许为空字符串
   * n: NotEmpty参数不允许为空字符串
   * i: Int参数为数字
-  * s: String参数为数字
+  * s: String参数为字符串
   * h: Hash参数为哈希数组如：{ name: 'time', description: 'sample' }
   * a: Array参数为数组如：[0, 1, 3, 9];
 

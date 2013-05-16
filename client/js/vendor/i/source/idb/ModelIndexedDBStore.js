@@ -14,6 +14,7 @@
 
             if (data !== undefined) {
                 model.fromArray(data, true);
+                model.fromStore = true;
             }
 
             cb(model);
@@ -26,6 +27,12 @@
         if (model instanceof this.getModel() === false) throw new I.Exception(20003);
         cb = cb || function() {};
         var deferred = Q.defer();
+
+        if (!model.isUpdated()) {
+            cb(model);
+            deferred.resolve(model);
+            return deferred.promise;
+        }
 
         this.db.set(this.modelName, model.toArray(), function() {
             model.reset();

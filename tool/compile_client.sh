@@ -18,7 +18,6 @@ java -jar ./compiler/compiler.jar \
     $SOURCE_PATH/model/Maker.js \
     $SOURCE_PATH/WebSocket.js \
     $SOURCE_PATH/DataPool.js \
-    $SOURCE_PATH/LogicController.js \
     $SOURCE_PATH/Renderer.js \
     $SOURCE_PATH/FileSystem.js \
     $SOURCE_PATH/Loader.js \
