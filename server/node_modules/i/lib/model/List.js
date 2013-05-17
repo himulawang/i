@@ -173,14 +173,8 @@
             this.tagDelSync = true;
         },
         // Array API
-        getKeys: function getKeys() {
-            var keys = [];
-            var util = I.Util;
-            for (var i in this) {
-                i = util.isUInt(i) ? parseInt(i) : i;
-                keys.push(i);
-            }
-            return keys;
+        keys: function keys() {
+            return Object.keys(this);
         },
         toAbbArray: function toAbbArray(filterOn) {
             var toAbbArray = {};

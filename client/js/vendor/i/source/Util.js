@@ -9,7 +9,7 @@
             if (Array.isArray(object)) {
                 var array = object;
             } else if (typeof object === 'object') {
-                var array = this.getKeys(object);
+                var array = Object.keys(object);
             } else {
                 throw new I.Exception(10209);
             }
@@ -19,18 +19,11 @@
             if (Array.isArray(object)) {
                 var array = object;
             } else if (typeof object === 'object') {
-                var array = this.getKeys(object);
+                var array = Object.keys(object);
             } else {
                 throw new I.Exception(10210);
             }
             return Math.min.apply(Math, array);     
-        },
-        getKeys: function getKeys(object) {
-            var keys = [];
-            for (var i in object) {
-                keys.push(i);
-            }
-            return keys;
         },
         getLength: function getLength(object) {
             if (Array.isArray(object)) {

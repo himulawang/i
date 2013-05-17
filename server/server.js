@@ -42,13 +42,6 @@ ws.on('request', function(req) {
     });
 });
 
-I.Models.ConnectionPKStore.get(function(err, pk) {
-    console.log(pk);
-    console.log(pk.fromStore);
-}).then(function(pk) {
-    console.log(pk.fromStore);
-});
-
 setTimeout(function() {
     var port = require(APP_ABS_PATH + '/config/env.js').env.WEB.PORT;
     server.listen(port);

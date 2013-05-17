@@ -17,7 +17,7 @@
             this.dropSync();
             this.updateSync();
             this.markDelSync();
-            this.getKeys();
+            this.keys();
             this.toAbbArray();
             this.toArray();
             this.fromAbbArray();
@@ -376,15 +376,15 @@
             list.markDelSync();
             testResultView.renderAssert(list.tagDelSync === true, 'tagDelSync is true.');
         },
-        getKeys: function getKeys() {
+        keys: function keys() {
             testResultView.renderTitle('List updateSync');
             var connection1 = new I.Models.Connection([1, 'test server1', '10.88.230.51', '6379', 'testAdd', 'testUpdate', 'testAbbFilter', 'testArrayFilter']);
             var connection2 = new I.Models.Connection([2, 'test server2', '10.88.230.52', '6379', 'testAdd', 'testUpdate', 'testAbbFilter', 'testArrayFilter']);
             var list = new I.Models.ConnectionList(1, { 1: connection1, 2: connection2 });
 
-            var keys = list.getKeys();
+            var keys = list.keys();
             testResultView.renderAssert(I.Util.isArray(keys), 'keys is Array.');
-            testResultView.renderAssert(I.Util.deepAssert(keys, [1, 2]), 'keys are right.');
+            testResultView.renderAssert(I.Util.deepAssert(keys, ['1', '2']), 'keys are right.');
         },
         toAbbArray: function toAbbArray() {
             testResultView.renderTitle('List toAbbArray');
