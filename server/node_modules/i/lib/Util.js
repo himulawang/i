@@ -134,6 +134,17 @@
             }
             return true;
         },
+        /*
+         * RegExp.$1 = firstIP Number
+         * RegExp.$3 = secondIP Number
+         * RegExp.$5 = thirdIP Number
+         * RegExp.$7 = forthIP Number
+         *
+         * return null || Array
+         * */
+        isIP: function isIP(val) {
+            return /^(\d|[1-9]\d|1\d\d|2([0-4]\d|5[0-5]))\.(\d|[1-9]\d|1\d\d|2([0-4]\d|5[0-5]))\.(\d|[1-9]\d|1\d\d|2([0-4]\d|5[0-5]))\.(\d|[1-9]\d|1\d\d|2([0-4]\d|5[0-5]))$/.exec(val);
+        },
         /* Date & Time */
         getTimestamp: function getTimestamp(time) {
             var stamp = this.getMicroTimestamp(time);

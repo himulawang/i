@@ -16,6 +16,7 @@
             if (data.length !== 0) {
                 data.forEach(function(n) {
                     var child = new modelClass();
+                    delete n.LISTID;
                     child.fromArray(n, true);
 
                     list.set(child);
